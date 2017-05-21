@@ -1,4 +1,9 @@
+#![no_std]
+#![crate_type = "rlib"]
+#![crate_name = "asm_x86_64"]
+
 #![feature(asm)]
+#![feature(no_core)]
 
 extern crate core;
 
