@@ -5,8 +5,6 @@
 #![feature(asm)]
 #![feature(no_core)]
 
-extern crate core;
-
 /// Module that contains CPUID instruction-related objects.
 pub mod cpuid;
 
