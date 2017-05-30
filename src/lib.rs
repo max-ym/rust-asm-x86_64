@@ -16,3 +16,6 @@ pub mod port;
 
 /// Segment registers.
 pub mod seg;
+
+/// Simple bitwise operations.
+pub mod bit;
