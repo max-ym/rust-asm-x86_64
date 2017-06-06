@@ -19,3 +19,6 @@ pub mod seg;
 
 /// Simple bitwise operations.
 pub mod bit;
+
+/// Control Register module.
+pub mod cr;
