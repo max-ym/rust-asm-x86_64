@@ -24,13 +24,16 @@ pub struct Cr3 {
 impl Reg for Cr3 {
 
     unsafe fn read() -> Self {
-        let cr3: Cr3;
+        let data: u64;
         asm!(
             "mov    rax, cr3"
-        :   "={rax}" (cr3)
+        :   "={rax}" (data)
         ::: "intel"
         );
-        cr3
+
+        Cr3 {
+            data: data
+        }
     }
 
     unsafe fn save(&self) {
