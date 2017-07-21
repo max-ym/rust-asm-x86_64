@@ -73,3 +73,71 @@ impl Default for P2ERef {
         }
     }
 }
+
+new_bitflags! {
+    pub flags PageFlag: u64 {
+        const present   = 1 << 0x00;
+        const rw        = 1 << 0x01;
+        const us        = 1 << 0x02;
+        const pwt       = 1 << 0x03;
+        const pcd       = 1 << 0x04;
+        const accessed  = 1 << 0x05;
+        const dirty     = 1 << 0x06;
+        const pat       = 1 << 0x07;
+        const ps        = 1 << 0x07;
+        const global    = 1 << 0x08;
+        const xd        = 1 << 0x3F;
+
+        const p1addr    = 0x0007FFFFFFFFF800;
+        const p2addrmap = 0x0007FFFFFFFFF800;
+        const p2addrref = 0x0007FFFFFFFFF000;
+        const p3addr    = 0x0007FFFFFFFFF800;
+        const p4addr    = 0x0007FFFFFFFFF800;
+    }
+}
+
+macro_rules! _impl {
+    ($name:tt) => (
+        impl $name {
+
+            /// Perform bitwise 'or' on entry.
+            ///
+            /// # Safety
+            /// Because the passed data is uncontrolled even invalid values
+            /// may be set.
+            pub unsafe fn data_bitwise_or(&mut self, val: u64) {
+                self.data |= val;
+            }
+
+            /// Disable all the bits of the
+            /// entry bitwise representation that are set in mask.
+            /// Then perform bitwise 'or' with the given value. It is not
+            /// checked if the value is lying inside the given mask.
+            ///
+            /// # Safety
+            /// Because the passed data is uncontrolled even invalid values
+            /// may be set.
+            pub unsafe fn data_bitwise_replace(&mut self, mask: u64,
+                    val: u64) {
+                self.data_bitwise_clear(mask);
+                self.data_bitwise_or(val);
+            }
+
+            /// Disable all the bits from entry bitfield representation
+            /// that are enabled in the given mask.
+            ///
+            /// # Safety
+            /// Because the passed data is uncontrolled even invalid values
+            /// may be set.
+            pub unsafe fn data_bitwise_clear(&mut self, mask: u64) {
+                self.data &= !mask;
+            }
+        }
+    );
+}
+
+_impl!(P1E);
+_impl!(P2EMap);
+_impl!(P2ERef);
+_impl!(P3E);
+_impl!(P4E);
