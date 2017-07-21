@@ -60,7 +60,7 @@ impl Default for P2EMap {
 
     fn default() -> Self {
         P2EMap {
-            data : 1 << 7, // Turn on PS
+            data : PageFlag::ps().into() // PS is on.
         }
     }
 }
@@ -69,7 +69,7 @@ impl Default for P2ERef {
 
     fn default() -> Self {
         P2ERef {
-            data : 0 << 7, // PS is off
+            data : 0 // PS is off.
         }
     }
 }
@@ -93,6 +93,13 @@ new_bitflags! {
         const p2addrref = 0x0007FFFFFFFFF000;
         const p3addr    = 0x0007FFFFFFFFF800;
         const p4addr    = 0x0007FFFFFFFFF800;
+    }
+}
+
+impl Into<u64> for PageFlag {
+
+    fn into(self) -> u64 {
+        unsafe { ::core::mem::transmute(self) }
     }
 }
 
