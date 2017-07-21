@@ -1,5 +1,5 @@
-use ::asm::msr::ApicBase;
-use ::asm::cpuid;
+use super::msr::ApicBase;
+use super::cpuid;
 
 /// Local APIC handle.
 pub struct LocalApic {
