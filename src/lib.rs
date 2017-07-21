@@ -20,6 +20,9 @@ pub mod port;
 /// Segment registers.
 pub mod seg;
 
+/// Module related to GDT, IDT, paging tables.
+pub mod tables;
+
 /// Simple bitwise operations.
 pub mod bit;
 
