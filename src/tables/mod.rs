@@ -1,3 +1,5 @@
+/// Module related to memory paging tables.
+pub mod paging;
 
 /// Entry from EntryTable.
 pub trait Entry: Sized {
