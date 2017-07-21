@@ -116,6 +116,15 @@ macro_rules! _impl {
                 self.data |= val;
             }
 
+            /// Perform bitwise 'or' on entry.
+            ///
+            /// # Safety
+            /// Because the passed data is uncontrolled even invalid values
+            /// may be set.
+            pub unsafe fn data_or(&mut self, val: PageFlag) {
+                self.data_bitwise_or(val.into())
+            }
+
             /// Disable all the bits of the
             /// entry bitwise representation that are set in mask.
             /// Then perform bitwise 'or' with the given value. It is not
@@ -130,6 +139,19 @@ macro_rules! _impl {
                 self.data_bitwise_or(val);
             }
 
+            /// Disable all the bits of the
+            /// entry bitwise representation that are set in mask.
+            /// Then perform bitwise 'or' with the given value. It is not
+            /// checked if the value is lying inside the given mask.
+            ///
+            /// # Safety
+            /// Because the passed data is uncontrolled even invalid values
+            /// may be set.
+            pub unsafe fn data_replace(&mut self, mask: PageFlag,
+                    val: PageFlag) {
+                self.data_bitwise_replace(mask.into(), val.into())
+            }
+
             /// Disable all the bits from entry bitfield representation
             /// that are enabled in the given mask.
             ///
@@ -138,6 +160,16 @@ macro_rules! _impl {
             /// may be set.
             pub unsafe fn data_bitwise_clear(&mut self, mask: u64) {
                 self.data &= !mask;
+            }
+
+            /// Disable all the bits from entry bitfield representation
+            /// that are enabled in the given mask.
+            ///
+            /// # Safety
+            /// Because the passed data is uncontrolled even invalid values
+            /// may be set.
+            pub unsafe fn data_clear(&mut self, mask: PageFlag) {
+                self.data_bitwise_clear(mask.into())
             }
         }
     );
