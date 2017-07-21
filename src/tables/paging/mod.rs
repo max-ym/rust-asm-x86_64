@@ -142,3 +142,34 @@ impl<'a> EntryHandle<'a> for P4EHandle {
         unsafe { P4EVariant::P4E(&*(self.addr as *const P4E)) }
     }
 }
+
+macro_rules! impl_table {
+    ($x:ident, $e:ident) => (
+        impl<'a> super::Table<'a> for $x {
+
+            type Handle = $e;
+
+            fn entry_handle(&self, index: u16) -> Self::Handle {
+                let index = index as u64;
+                $e::from_raw_addr(self.addr() + index * 8)
+            }
+
+            fn limit(&self) -> u16 {
+                (self.entry_count() * 8) as _ // always 4096
+            }
+
+            fn entry_count(&self) -> u16 {
+                self.entries.len() as _ // always 512
+            }
+
+            fn addr(&self) -> u64 {
+                &self.entries[0] as *const _ as _
+            }
+        }
+    );
+}
+
+impl_table!(P1, P1EHandle);
+impl_table!(P2, P2EHandle);
+impl_table!(P3, P3EHandle);
+impl_table!(P4, P4EHandle);
