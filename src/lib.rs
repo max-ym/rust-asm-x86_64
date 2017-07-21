@@ -5,6 +5,9 @@
 #![feature(asm)]
 #![feature(no_core)]
 
+/// Module related to I/O APIC and Local APIC.
+pub mod apic;
+
 /// Module that contains CPUID instruction-related objects.
 pub mod cpuid;
 
