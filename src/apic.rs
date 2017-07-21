@@ -9,7 +9,7 @@ pub struct LocalApic {
 /// List of all local APIC registers and their addresses.
 #[repr(u64)]
 #[derive(PartialEq, Clone, Copy)]
-enum LocalApicReg {
+pub enum LocalApicReg {
     Id                      = 0x020, // RW (Nehalem RO)
     Version                 = 0x030, // RO
 
