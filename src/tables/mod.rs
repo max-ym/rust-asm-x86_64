@@ -14,7 +14,17 @@ pub trait Entry: Sized {
 /// for a single position in the entry table provides functionality
 /// to define actual type of entry and its appropriate representation.
 pub trait EntryHandle<'a> {
-    // TODO
+
+    /// A type of entry variants that this handle can return.
+    type Variant: EntryVariant;
+
+    fn variant(&self) -> Self::Variant;
+}
+
+/// A representation variant of some table entry. Is returned by
+/// entry handle to represent specific entry type with its own fields
+/// and methods.
+pub trait EntryVariant {
 }
 
 /// Table of entries. Like GDT, IDT, paging tables.
