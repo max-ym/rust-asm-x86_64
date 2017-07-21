@@ -1,4 +1,4 @@
-use super::{Entry, EntryHandle, EntryVariant};
+use super::{Entry, EntryVariant};
 
 /// Page Table entry. Page table level 1 entry. Maps 4KiB page.
 #[repr(packed)]
@@ -35,11 +35,10 @@ pub struct P4E {
     data: u64
 }
 
-pub struct PEntryHandle<'a> {
-    data_ref: &'a u64
-}
-
-pub enum PEntryVariant {
+/// Variants of P2E.
+pub enum P2EVariant<'a> {
+    P2EMap  (&'a P2EMap),
+    P2ERef  (&'a P2ERef),
 }
 
 impl Entry for P1E {
@@ -72,17 +71,5 @@ impl Default for P2ERef {
         P2ERef {
             data : 0 << 7, // PS is off
         }
-    }
-}
-
-impl EntryVariant for PEntryVariant {
-}
-
-impl<'a> EntryHandle<'a> for PEntryHandle<'a> {
-
-    type Variant = PEntryVariant;
-
-    fn variant(&self) -> Self::Variant {
-        unimplemented!()
     }
 }
