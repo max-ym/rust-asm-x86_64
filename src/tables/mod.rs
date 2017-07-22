@@ -1,3 +1,6 @@
+/// Module implementing Interrupt Descriptor Table.
+pub mod idt;
+
 /// Module related to memory paging tables.
 pub mod paging;
 
