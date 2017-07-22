@@ -65,35 +65,6 @@ new_handle!(P2EHandle, P2);
 new_handle!(P3EHandle, P3);
 new_handle!(P4EHandle, P4);
 
-pub enum P1EVariant<'a> {
-    P1E(&'a P1E)
-}
-
-pub enum P2EVariant<'a> {
-    Map(&'a P2EMap),
-    Ref(&'a P2ERef),
-}
-
-pub enum P3EVariant<'a> {
-    P3E(&'a P3E)
-}
-
-pub enum P4EVariant<'a> {
-    P4E(&'a P4E)
-}
-
-impl<'a> EntryVariant for P1EVariant<'a> {
-}
-
-impl<'a> EntryVariant for P2EVariant<'a> {
-}
-
-impl<'a> EntryVariant for P3EVariant<'a> {
-}
-
-impl<'a> EntryVariant for P4EVariant<'a> {
-}
-
 impl<'a> EntryHandle<'a> for P1EHandle {
 
     type Variant = P1EVariant<'a>;

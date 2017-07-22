@@ -1,4 +1,4 @@
-use super::{Entry};
+use super::{Entry, EntryVariant};
 
 /// Page Table entry. Page table level 1 entry. Maps 4KiB page.
 #[repr(packed)]
@@ -66,6 +66,35 @@ impl Default for P2ERef {
             data : 0 // PS is off.
         }
     }
+}
+
+pub enum P1EVariant<'a> {
+    P1E(&'a P1E)
+}
+
+pub enum P2EVariant<'a> {
+    Map(&'a P2EMap),
+    Ref(&'a P2ERef),
+}
+
+pub enum P3EVariant<'a> {
+    P3E(&'a P3E)
+}
+
+pub enum P4EVariant<'a> {
+    P4E(&'a P4E)
+}
+
+impl<'a> EntryVariant for P1EVariant<'a> {
+}
+
+impl<'a> EntryVariant for P2EVariant<'a> {
+}
+
+impl<'a> EntryVariant for P3EVariant<'a> {
+}
+
+impl<'a> EntryVariant for P4EVariant<'a> {
 }
 
 new_bitflags! {
