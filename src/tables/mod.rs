@@ -59,12 +59,17 @@ pub trait Table<'a> {
 
     /// Get address of the table.
     fn addr(&self) -> u64;
+
+    /// An amount of bytes that is skipped when index is incremented by 1.
+    /// This equals to the smallest entry size that can be stored in the
+    /// table.
+    fn limit_step() -> u16;
 }
 
 /// Descriptor Table Register Value.
-pub trait RegValue: Sized {
+pub trait RegValue<'a>: Sized {
 
-    type HandleType : Table;
+    type HandleType: Table<'a>;
 
     /// Write current value to appropriate DTR.
     unsafe fn write(&self);
@@ -151,12 +156,12 @@ impl From<u16> for DescriptorType {
 /// same name to override them. Implementing this trait lets to use default
 /// functions to calculate limit bounds in spite of implementing the same
 /// function for each DT entry type individually.
-pub trait DtLimit: Table {
+pub trait DtLimit<'a>: Table<'a> {
 
     /// Convert element index to minimal limit value of the handle that
     /// must be set so that this element could be accessed.
     fn limit_from_index(index: u16) -> u16 {
-        (index + 1) * Self::EntryType::size() as u16 - 1
+        (index + 1) * Self::limit_step() - 1
     }
 
     /// Set limit to given value. Function does not check if given limit
