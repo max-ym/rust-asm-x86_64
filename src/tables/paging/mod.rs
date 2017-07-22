@@ -159,6 +159,8 @@ macro_rules! impl_table {
             fn addr(&self) -> u64 {
                 &self.entries[0] as *const _ as _
             }
+
+            fn limit_step() -> u16 { 8 }
         }
     );
 }
