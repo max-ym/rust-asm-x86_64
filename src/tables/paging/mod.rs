@@ -110,13 +110,13 @@ impl<'a> EntryHandle<'a> for P2EHandle {
     fn variant(&self) -> P2EVariant<'a> {
         let data = unsafe { *(self.addr as *const u64) };
 
-        let is_map = |addr: u64| -> bool {
+        let is_map = |data: u64| -> bool {
             let val: u64 = PageFlag::ps().into();
-            val & addr == 1
+            val & data == 1
         };
 
         unsafe {
-            if is_map(self.addr) {
+            if is_map(data) {
                 P2EVariant::Map(&*(self.addr as *const P2EMap))
             } else {
                 P2EVariant::Ref(&*(self.addr as *const P2ERef))
