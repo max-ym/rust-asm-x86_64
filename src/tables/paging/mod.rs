@@ -125,6 +125,29 @@ impl<'a> EntryHandle<'a> for P2EHandle {
     }
 }
 
+impl P2EHandle {
+
+    /// Store given P2ERef by this handle table position pointer.
+    ///
+    /// # Safety
+    /// Changing paging tables may violate memory consistency.
+    pub unsafe fn set_ref(&mut self, e: P2ERef) -> &P2ERef {
+        let ptr = self.addr as *const P2ERef as *mut _;
+        *ptr = e;
+        &*ptr
+    }
+
+    /// Store given P2EMap by this handle table position pointer.
+    ///
+    /// # Safety
+    /// Changing paging tables may violate memory consistency.
+    pub unsafe fn set_map(&mut self, e: P2EMap) -> &P2EMap {
+        let ptr = self.addr as *const P2EMap as *mut _;
+        *ptr = e;
+        &*ptr
+    }
+}
+
 impl<'a> EntryHandle<'a> for P3EHandle {
 
     type Variant = P3EVariant<'a>;
