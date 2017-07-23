@@ -106,3 +106,12 @@ impl Entry for TrapGate {
 
 impl Entry for InterruptGate {
 }
+
+/// IDT gate variants.
+pub enum IdtGateVariant<'a> {
+    Trap        (&'a TrapGate       ),
+    Interrupt   (&'a InterruptGate  ),
+}
+
+impl<'a> EntryVariant for IdtGateVariant<'a> {
+}
