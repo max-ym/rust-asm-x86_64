@@ -217,3 +217,61 @@ pub trait IdtGate: Entry {
     /// change any of it's bit. Even if some bits must be zero (but are set).
     unsafe fn set_flags(&mut self, f: u16);
 }
+
+impl IdtGate for TrapGate {
+
+    fn offset_fields(&self) -> (u16, u16, u32) {
+        (self.offset0, self.offset1, self.offset2)
+    }
+
+    unsafe fn set_offset_fields(&mut self, offset: (u16, u16, u32)) {
+        self.offset0 = offset.0;
+        self.offset1 = offset.1;
+        self.offset2 = offset.2;
+    }
+
+    fn segsel(&self) -> u16 {
+        self.segsel
+    }
+
+    unsafe fn set_segsel(&mut self, ss: u16) {
+        self.segsel = ss;
+    }
+
+    fn flags(&self) -> u16 {
+        self.flags
+    }
+
+    unsafe fn set_flags(&mut self, flags: u16) {
+        self.flags = flags;
+    }
+}
+
+impl IdtGate for InterruptGate {
+
+    fn offset_fields(&self) -> (u16, u16, u32) {
+        (self.offset0, self.offset1, self.offset2)
+    }
+
+    unsafe fn set_offset_fields(&mut self, offset: (u16, u16, u32)) {
+        self.offset0 = offset.0;
+        self.offset1 = offset.1;
+        self.offset2 = offset.2;
+    }
+
+    fn segsel(&self) -> u16 {
+        self.segsel
+    }
+
+    unsafe fn set_segsel(&mut self, ss: u16) {
+        self.segsel = ss;
+    }
+
+    fn flags(&self) -> u16 {
+        self.flags
+    }
+
+    unsafe fn set_flags(&mut self, flags: u16) {
+        self.flags = flags;
+    }
+}
