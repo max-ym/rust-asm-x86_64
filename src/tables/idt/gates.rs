@@ -1,3 +1,5 @@
+use super::*;
+
 /// The list of architecture defined interrupt vectors.
 /// For more information see Intel System Programming Guide.
 #[derive(Copy, Clone)]
@@ -97,4 +99,10 @@ impl Default for InterruptGate {
             _reserved   : 0,
         }
     }
+}
+
+impl Entry for TrapGate {
+}
+
+impl Entry for InterruptGate {
 }
