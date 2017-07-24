@@ -64,6 +64,14 @@ impl IdtGateHandle {
             addr: entry_addr
         }
     }
+
+    /// Create IdtGateHandle and indicate that table limit was broken.
+    /// That means that such an entry does not exist in the table.
+    pub fn new_for_broken_limit() -> Self {
+        IdtGateHandle {
+            addr: 0
+        }
+    }
 }
 
 impl<'a> Table<'a> for IdtCtrl {
@@ -71,6 +79,10 @@ impl<'a> Table<'a> for IdtCtrl {
     type Handle = IdtGateHandle;
 
     fn entry_handle(&self, index: u16) -> Self::Handle {
+        if self.limit_broken_by(index) {
+            return IdtGateHandle::new_for_broken_limit();
+        }
+
         let offset = index * Self::limit_step();
         let addr = self.addr() + offset as u64;
 
