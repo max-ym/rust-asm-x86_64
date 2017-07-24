@@ -101,3 +101,34 @@ impl CallGateDescriptor {
         self.flags & !mask
     }
 }
+
+impl TssDescriptor {
+
+    pub fn flags(&self) -> (u16, u8) {
+        (self.flags0, self.flags1)
+    }
+
+    pub unsafe fn set_flags0(&mut self, flags: u16) {
+        self.flags0 = flags;
+    }
+
+    pub unsafe fn set_flags1(&mut self, flags: u8) {
+        self.flags1 = flags;
+    }
+
+    pub fn masked_flags0(&self, mask: u16) -> u16 {
+        self.flags0 & mask
+    }
+
+    pub fn unmasked_flags0(&self, mask: u16) -> u16 {
+        self.flags0 & !mask
+    }
+
+    pub fn masked_flags1(&self, mask: u8) -> u8 {
+        self.flags1 & mask
+    }
+
+    pub fn unmasked_flags1(&self, mask: u8) -> u8 {
+        self.flags1 & !mask
+    }
+}
