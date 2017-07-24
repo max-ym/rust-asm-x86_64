@@ -1,5 +1,12 @@
 use super::*;
 
+/// The first descriptor in GDT is null.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct NullDescriptor {
+    null    : u64
+}
+
 #[repr(packed)]
 #[derive(Clone, Copy)]
 pub struct CallGateDescriptor {
