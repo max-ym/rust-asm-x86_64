@@ -1,3 +1,6 @@
+/// Module implementing Global Descriptor Table.
+pub mod gdt;
+
 /// Module implementing Interrupt Descriptor Table.
 pub mod idt;
 
