@@ -158,7 +158,15 @@ pub enum DescriptorType {
 impl From<u16> for DescriptorType {
 
     fn from(v: u16) -> Self {
-        unsafe { ::core::mem::transmute(v) }
+        use self::DescriptorType::*;
+
+        if v == Ldt             as _ { Ldt              } else
+        if v == TssAvailable    as _ { TssAvailable     } else
+        if v == TssBusy         as _ { TssBusy          } else
+        if v == CallGate        as _ { CallGate         } else
+        if v == InterruptGate   as _ { InterruptGate    } else
+        if v == TrapGate        as _ { TrapGate         } else
+        { Reserved }
     }
 }
 
@@ -172,6 +180,12 @@ impl DescriptorType {
     /// Get the type of the descriptor from the flags field.
     pub fn type_field_from_flags(flags: u16) -> u16 {
         (flags >> 8) & 0xF
+    }
+
+    /// Convert number to DescriptorType without checking if the value
+    /// is a valid enum variant.
+    pub unsafe fn fast_from(v: u16) -> Self {
+        ::core::mem::transmute(v)
     }
 }
 
