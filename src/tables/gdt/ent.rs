@@ -1,3 +1,5 @@
+use super::*;
+
 #[repr(packed)]
 #[derive(Clone, Copy)]
 pub struct CallGateDescriptor {
@@ -31,4 +33,13 @@ pub struct LdtDescriptor {
     base1   : u8 ,
     base2   : u32,
     resv    : u32,
+}
+
+impl Entry for CallGateDescriptor {
+}
+
+impl Entry for TssDescriptor {
+}
+
+impl Entry for LdtDescriptor {
 }
