@@ -28,3 +28,30 @@ pub enum Ist {
     Ist2 = 2,
     Ist3 = 3,
 }
+
+/// Handle for entry of IDT.
+pub struct IdtGateHandle {
+    addr    : u64
+}
+
+impl<'a> EntryHandle<'a> for IdtGateHandle {
+
+    type Variant = IdtGateVariant<'a>;
+
+    fn variant(&self) -> Self::Variant {
+        let ptr = self.addr as *const u64;
+        let data = unsafe { *ptr };
+        let type_field = DescriptorType::type_field_from_raw64(data);
+
+        use self::IdtGateVariant::*;
+        if type_field == DescriptorType::InterruptGate as _ {
+            let ptr = ptr as *const InterruptGate;
+            Interrupt(unsafe { &*ptr })
+        } else if type_field == DescriptorType::TrapGate as _ {
+            let ptr = ptr as *const TrapGate;
+            Trap(unsafe { &*ptr })
+        } else {
+            Unknown
+        }
+    }
+}
