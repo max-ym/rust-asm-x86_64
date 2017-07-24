@@ -141,9 +141,9 @@ macro_rules! impl_tss_ldt {
             }
 
             pub unsafe fn set_base(&mut self, base: u64) {
-                self.base0 = ((base & 0x00000000_0000FFFF) << 0x00) as _;
-                self.base1 = ((base & 0x00000000_00FF0000) << 0x10) as _;
-                self.base2 = ((base & 0x00FFFFFF_FF000000) << 0x18) as _;
+                self.base0 = ((base & 0x00000000_0000FFFF) >> 0x00) as _;
+                self.base1 = ((base & 0x00000000_00FF0000) >> 0x10) as _;
+                self.base2 = ((base & 0x00FFFFFF_FF000000) >> 0x18) as _;
             }
 
             pub fn limit(&self) -> u16 {
