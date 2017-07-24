@@ -43,3 +43,19 @@ impl Entry for TssDescriptor {
 
 impl Entry for LdtDescriptor {
 }
+
+pub mod tss_ldt_flags {
+    // First flags byte.
+    pub const DPL           : u16 = 3 << 13; // 0b11 << 13
+    pub const PRESENT       : u16 = 1 << 15;
+
+    // Second flags byte.
+    pub const LIMIT         : u16 = 0xF;
+    pub const AVAILABLE     : u16 = 1 << 4;
+    pub const GRANULARITY   : u16 = 1 << 7;
+}
+
+pub mod call_flags {
+    pub const DPL           : u16 = 3 << 13; // 0b11 << 13
+    pub const PRESENT       : u16 = 1 << 15;
+}
