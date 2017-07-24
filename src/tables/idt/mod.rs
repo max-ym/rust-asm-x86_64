@@ -65,3 +65,28 @@ impl IdtGateHandle {
         }
     }
 }
+
+impl<'a> Table<'a> for IdtCtrl {
+
+    type Handle = IdtGateHandle;
+
+    fn entry_handle(&self, index: u16) -> Self::Handle {
+        let offset = index * Self::limit_step();
+        let addr = self.addr() + offset as u64;
+
+        IdtGateHandle::new_by_addr(addr)
+    }
+
+    fn limit(&self) -> u16 {
+        self.limit
+    }
+
+    /// Get address of the table.
+    fn addr(&self) -> u64 {
+        self.idt as u64
+    }
+
+    fn limit_step() -> u16 {
+        8
+    }
+}
