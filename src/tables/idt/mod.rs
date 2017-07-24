@@ -39,10 +39,6 @@ impl<'a> EntryHandle<'a> for IdtGateHandle {
     type Variant = IdtGateVariant<'a>;
 
     fn variant(&self) -> Self::Variant {
-        if self.addr == 0 {
-            return IdtGateVariant::Missing;
-        }
-
         let ptr = self.addr as *const u64;
         let data = unsafe { *ptr };
         let type_field = DescriptorType::type_field_from_raw64(data);
@@ -68,29 +64,21 @@ impl IdtGateHandle {
             addr: entry_addr
         }
     }
-
-    /// Create IdtGateHandle and indicate that table limit was broken.
-    /// That means that such an entry does not exist in the table.
-    pub fn new_for_broken_limit() -> Self {
-        IdtGateHandle {
-            addr: 0
-        }
-    }
 }
 
 impl<'a> Table<'a> for IdtCtrl {
 
     type Handle = IdtGateHandle;
 
-    fn entry_handle(&self, index: u16) -> Self::Handle {
+    fn entry_handle(&self, index: u16) -> Option<Self::Handle> {
         if self.limit_broken_by(index) {
-            return IdtGateHandle::new_for_broken_limit();
+            return None;
         }
 
         let offset = index * Self::limit_step();
         let addr = self.addr() + offset as u64;
 
-        IdtGateHandle::new_by_addr(addr)
+        Some(IdtGateHandle::new_by_addr(addr))
     }
 
     fn limit(&self) -> u16 {

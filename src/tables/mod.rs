@@ -38,8 +38,9 @@ pub trait Table<'a> {
     /// A type of handle that will be returned when accessing table field.
     type Handle: EntryHandle<'a>;
 
-    /// Get entry handle by entry index in the table.
-    fn entry_handle(&self, index: u16) -> Self::Handle;
+    /// Get entry handle by entry index in the table. None is returned if
+    /// index breaks table limit.
+    fn entry_handle(&self, index: u16) -> Option<Self::Handle>;
 
     /// Get limit of entry table. Limit is presented in bytes count.
     fn limit(&self) -> u16;

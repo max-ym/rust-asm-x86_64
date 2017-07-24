@@ -143,9 +143,13 @@ macro_rules! impl_table {
 
             type Handle = $e;
 
-            fn entry_handle(&self, index: u16) -> Self::Handle {
+            fn entry_handle(&self, index: u16) -> Option<Self::Handle> {
+                if self.limit_broken_by(index) {
+                    return None;
+                }
+
                 let index = index as u64;
-                $e::from_raw_addr(self.addr() + index * 8)
+                Some($e::from_raw_addr(self.addr() + index * 8))
             }
 
             fn limit(&self) -> u16 {

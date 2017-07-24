@@ -112,9 +112,6 @@ pub enum IdtGateVariant<'a> {
     Trap        (&'a TrapGate       ),
     Interrupt   (&'a InterruptGate  ),
 
-    /// This entry does not exist in the table.
-    Missing,
-
     /// The type of an entry is unknown or invalid for this table.
     Unknown
 }
