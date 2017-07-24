@@ -68,6 +68,12 @@ pub trait Table<'a> {
     /// This equals to the smallest entry size that can be stored in the
     /// table.
     fn limit_step() -> u16;
+
+    /// Convert element index to minimal limit value of the handle that
+    /// must be set so that this element could be accessed.
+    fn limit_from_index(index: u16) -> u16 {
+        (index + 1) * Self::limit_step() - 1
+    }
 }
 
 /// Descriptor Table Register Value.
@@ -168,28 +174,13 @@ impl DescriptorType {
 
 /// Descriptor Table entry limit field trait.
 ///
-/// Implements specific limit field functions in descriptors.
-/// Designed to be used with 'Table' trait which provides functions with the
-/// same name to override them. Implementing this trait lets to use default
-/// functions to calculate limit bounds in spite of implementing the same
-/// function for each DT entry type individually.
+/// This trait indicates that table limit can be modified and provides
+/// functions to change limit value.
 pub trait DtLimit<'a>: Table<'a> {
-
-    /// Convert element index to minimal limit value of the handle that
-    /// must be set so that this element could be accessed.
-    fn limit_from_index(index: u16) -> u16 {
-        (index + 1) * Self::limit_step() - 1
-    }
 
     /// Set limit to given value. Function does not check if given limit
     /// is of a valid value.
     unsafe fn set_limit(&mut self, limit: u16);
-
-    /// Check if given index breaks the limit of DT. If so, there is no
-    /// descriptor with given index in the table.
-    fn limit_broken_by(&self, index: u16) -> bool {
-        self.limit() < Self::limit_from_index(index)
-    }
 
     /// Set entry count of entry table. This count is converted
     /// to apropriate limit value and is set in the handle. This
