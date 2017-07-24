@@ -79,3 +79,6 @@ pub enum GdtVariant<'a> {
 
     Unknown
 }
+
+impl<'a> EntryVariant for GdtVariant<'a> {
+}
