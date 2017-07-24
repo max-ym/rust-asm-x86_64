@@ -69,3 +69,13 @@ pub mod call_flags {
     pub const DPL           : u16 = 3 << 13; // 0b11 << 13
     pub const PRESENT       : u16 = 1 << 15;
 }
+
+/// GDT entry variant.
+pub enum GdtVariant<'a> {
+    Null    (&'a NullDescriptor     ),
+    Call    (&'a CallGateDescriptor ),
+    Tss     (&'a TssDescriptor      ),
+    Ldt     (&'a LdtDescriptor      ),
+
+    Unknown
+}
