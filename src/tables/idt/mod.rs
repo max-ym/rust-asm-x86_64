@@ -55,3 +55,13 @@ impl<'a> EntryHandle<'a> for IdtGateHandle {
         }
     }
 }
+
+impl IdtGateHandle {
+
+    /// Create IdtGateHandle by providing entry address.
+    pub fn new_by_addr(entry_addr: u64) -> Self {
+        IdtGateVariant {
+            addr: entry_addr
+        }
+    }
+}
