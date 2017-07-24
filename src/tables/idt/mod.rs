@@ -94,3 +94,10 @@ impl<'a> Table<'a> for IdtCtrl {
         8
     }
 }
+
+impl<'a> DtLimit<'a> for IdtCtrl {
+
+    unsafe fn set_limit(&mut self, limit: u16) {
+        self.limit = limit;
+    }
+}
