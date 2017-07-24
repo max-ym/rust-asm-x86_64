@@ -49,7 +49,10 @@ pub trait Table<'a> {
     /// set to 16 then this function will return 2. If limit is set to
     /// value 15, then this function will return 1. If no elements can
     /// be stored in the table, 0 is returned.
-    fn entry_count(&self) -> u16;
+    fn entry_count(&self) -> u16 {
+        // add 1 because limit = 0 means one valid byte, limit = 1 means two...
+        (self.limit() + 1) / Self::limit_step()
+    }
 
     /// Check if given index breaks the limit of entry table.
     /// If so, there is no entry with given index in the table.
