@@ -149,6 +149,19 @@ impl From<u16> for DescriptorType {
     }
 }
 
+impl DescriptorType {
+
+    /// Get the type of the descriptor from raw first 8 bytes.
+    pub fn type_field_from_raw64(data: u64) -> u16 {
+        ((data >> (8 + 32)) & 0xF) as _
+    }
+
+    /// Get the type of the descriptor from the flags field.
+    pub fn type_field_from_flags(flags: u16) -> u16 {
+        (flags >> 8) & 0xF
+    }
+}
+
 /// Descriptor Table entry limit field trait.
 ///
 /// Implements specific limit field functions in descriptors.
