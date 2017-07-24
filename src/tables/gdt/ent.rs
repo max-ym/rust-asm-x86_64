@@ -42,6 +42,9 @@ pub struct LdtDescriptor {
     resv    : u32,
 }
 
+impl Entry for NullDescriptor {
+}
+
 impl Entry for CallGateDescriptor {
 }
 
