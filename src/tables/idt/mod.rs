@@ -39,6 +39,10 @@ impl<'a> EntryHandle<'a> for IdtGateHandle {
     type Variant = IdtGateVariant<'a>;
 
     fn variant(&self) -> Self::Variant {
+        if self.addr == 0 {
+            return IdtGateVariant::Missing;
+        }
+
         let ptr = self.addr as *const u64;
         let data = unsafe { *ptr };
         let type_field = DescriptorType::type_field_from_raw64(data);
