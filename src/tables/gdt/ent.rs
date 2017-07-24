@@ -82,3 +82,22 @@ pub enum GdtVariant<'a> {
 
 impl<'a> EntryVariant for GdtVariant<'a> {
 }
+
+impl CallGateDescriptor {
+
+    pub fn flags(&self) -> u16 {
+        self.flags
+    }
+
+    pub unsafe fn set_flags(&mut self, flags: u16) {
+        self.flags = flags;
+    }
+
+    pub fn masked_flags(&self, mask: u16) -> u16 {
+        self.flags & mask
+    }
+
+    pub fn unmasked_flags(&self, mask: u16) -> u16 {
+        self.flags & !mask
+    }
+}
