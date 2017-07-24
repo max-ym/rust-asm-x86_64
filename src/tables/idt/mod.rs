@@ -60,7 +60,7 @@ impl IdtGateHandle {
 
     /// Create IdtGateHandle by providing entry address.
     pub fn new_by_addr(entry_addr: u64) -> Self {
-        IdtGateVariant {
+        IdtGateHandle {
             addr: entry_addr
         }
     }
