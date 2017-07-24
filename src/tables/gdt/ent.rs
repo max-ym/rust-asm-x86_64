@@ -139,6 +139,14 @@ macro_rules! impl_tss_ldt {
                 self.base1 = ((base & 0x00000000_00FF0000) << 0x10) as _;
                 self.base2 = ((base & 0x00FFFFFF_FF000000) << 0x18) as _;
             }
+
+            pub fn limit(&self) -> u16 {
+                self.limit
+            }
+
+            pub unsafe fn set_limit(&mut self, limit: u16) {
+                self.limit = limit;
+            }
         }
     );
 }
