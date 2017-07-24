@@ -133,6 +133,12 @@ macro_rules! impl_tss_ldt {
             pub fn unmasked_flags1(&self, mask: u8) -> u8 {
                 self.flags1 & !mask
             }
+
+            pub unsafe fn set_base(&mut self, base: u64) {
+                self.base0 = ((base & 0x00000000_0000FFFF) << 0x00) as _;
+                self.base1 = ((base & 0x00000000_00FF0000) << 0x10) as _;
+                self.base2 = ((base & 0x00FFFFFF_FF000000) << 0x18) as _;
+            }
         }
     );
 }
