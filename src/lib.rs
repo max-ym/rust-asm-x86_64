@@ -31,7 +31,7 @@ pub mod seg;
 /// Module related to GDT, IDT, paging tables.
 pub mod tables;
 
-/// Simple bitwise operations.
+/// Simple bitwise operations that can be accelerated by CPU.
 pub mod bit;
 
 /// Control Register module.
