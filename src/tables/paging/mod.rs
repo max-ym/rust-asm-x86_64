@@ -70,7 +70,7 @@ impl<'a> EntryHandle<'a> for P1EHandle {
     type Variant = P1EVariant<'a>;
 
     fn variant(&self) -> P1EVariant<'a> {
-        unsafe { P1EVariant::P1E(&*(self.addr as *const P1E)) }
+        unsafe { P1EVariant::P1E(&mut *(self.addr as *const P1E as *mut _)) }
     }
 }
 
@@ -88,9 +88,9 @@ impl<'a> EntryHandle<'a> for P2EHandle {
 
         unsafe {
             if is_map(data) {
-                P2EVariant::Map(&*(self.addr as *const P2EMap))
+                P2EVariant::Map(&mut *(self.addr as *const P2EMap as *mut _))
             } else {
-                P2EVariant::Ref(&*(self.addr as *const P2ERef))
+                P2EVariant::Ref(&mut *(self.addr as *const P2ERef as *mut _))
             }
         }
     }
@@ -102,20 +102,20 @@ impl P2EHandle {
     ///
     /// # Safety
     /// Changing paging tables may violate memory consistency.
-    pub unsafe fn set_ref(&mut self, e: P2ERef) -> &P2ERef {
+    pub unsafe fn set_ref(&mut self, e: P2ERef) -> &mut P2ERef {
         let ptr = self.addr as *const P2ERef as *mut _;
         *ptr = e;
-        &*ptr
+        &mut *ptr
     }
 
     /// Store given P2EMap by this handle table position pointer.
     ///
     /// # Safety
     /// Changing paging tables may violate memory consistency.
-    pub unsafe fn set_map(&mut self, e: P2EMap) -> &P2EMap {
+    pub unsafe fn set_map(&mut self, e: P2EMap) -> &mut P2EMap {
         let ptr = self.addr as *const P2EMap as *mut _;
         *ptr = e;
-        &*ptr
+        &mut *ptr
     }
 }
 
@@ -124,7 +124,7 @@ impl<'a> EntryHandle<'a> for P3EHandle {
     type Variant = P3EVariant<'a>;
 
     fn variant(&self) -> P3EVariant<'a> {
-        unsafe { P3EVariant::P3E(&*(self.addr as *const P3E)) }
+        unsafe { P3EVariant::P3E(&mut *(self.addr as *const P3E as *mut _)) }
     }
 }
 
@@ -133,7 +133,7 @@ impl<'a> EntryHandle<'a> for P4EHandle {
     type Variant = P4EVariant<'a>;
 
     fn variant(&self) -> P4EVariant<'a> {
-        unsafe { P4EVariant::P4E(&*(self.addr as *const P4E)) }
+        unsafe { P4EVariant::P4E(&mut *(self.addr as *const P4E as *mut _)) }
     }
 }
 

@@ -69,20 +69,20 @@ impl Default for P2ERef {
 }
 
 pub enum P1EVariant<'a> {
-    P1E(&'a P1E)
+    P1E(&'a mut P1E)
 }
 
 pub enum P2EVariant<'a> {
-    Map(&'a P2EMap),
-    Ref(&'a P2ERef),
+    Map(&'a mut P2EMap),
+    Ref(&'a mut P2ERef),
 }
 
 pub enum P3EVariant<'a> {
-    P3E(&'a P3E)
+    P3E(&'a mut P3E)
 }
 
 pub enum P4EVariant<'a> {
-    P4E(&'a P4E)
+    P4E(&'a mut P4E)
 }
 
 impl<'a> EntryVariant for P1EVariant<'a> {
