@@ -175,6 +175,16 @@ macro_rules! _impl {
                 self.data_bitwise_replace(mask.into(), val.into())
             }
 
+            /// Ignore old value of the field and rewrite them with
+            /// given flags.
+            ///
+            /// # Safety
+            /// Because the passed data is uncontrolled even invalid values
+            /// may be set.
+            pub unsafe fn data_rewrite(&mut self, val: PageFlag) {
+                self.data = val.into();
+            }
+
             /// Disable all the bits from entry bitfield representation
             /// that are enabled in the given mask.
             ///
