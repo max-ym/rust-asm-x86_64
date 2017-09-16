@@ -126,6 +126,13 @@ impl Into<u64> for PageFlag {
     }
 }
 
+impl From<u64> for PageFlag {
+
+    fn from(v: u64) -> Self {
+        unsafe { ::core::mem::transmute(v) }
+    }
+}
+
 macro_rules! _impl {
     ($name:tt) => (
         impl $name {
