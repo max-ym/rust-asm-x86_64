@@ -102,7 +102,7 @@ impl P2EHandle {
     ///
     /// # Safety
     /// Changing paging tables may violate memory consistency.
-    pub unsafe fn set_ref(&mut self, e: P2ERef) -> &mut P2ERef {
+    pub unsafe fn set_ref(&self, e: P2ERef) -> &mut P2ERef {
         let ptr = self.addr as *const P2ERef as *mut _;
         *ptr = e;
         &mut *ptr
@@ -112,7 +112,7 @@ impl P2EHandle {
     ///
     /// # Safety
     /// Changing paging tables may violate memory consistency.
-    pub unsafe fn set_map(&mut self, e: P2EMap) -> &mut P2EMap {
+    pub unsafe fn set_map(&self, e: P2EMap) -> &mut P2EMap {
         let ptr = self.addr as *const P2EMap as *mut _;
         *ptr = e;
         &mut *ptr
