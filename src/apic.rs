@@ -202,19 +202,7 @@ impl DivideConfiguration {
 
     /// Set specified divide value.
     pub fn set(&mut self, div: DivideValue) {
-        use self::DivideValue::*;
-        unsafe {
-            self.set_reg(match div {
-                Div2    => 0b0000,
-                Div4    => 0b0001,
-                Div8    => 0b0010,
-                Div16   => 0b0011,
-                Div32   => 0b1000,
-                Div64   => 0b1001,
-                Div128  => 0b1010,
-                Div1    => 0b1011,
-            });
-        }
+        unsafe { self.set_reg(div as _); }
     }
 
     /// Get value of this register.
