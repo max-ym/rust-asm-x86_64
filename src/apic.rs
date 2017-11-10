@@ -73,6 +73,7 @@ pub enum LocalApicReg {
 }
 
 /// Value of DivideConfiguration register of APIC.
+#[repr(packed)]
 pub struct DivideConfiguration {
     reg     : u32,
 }
