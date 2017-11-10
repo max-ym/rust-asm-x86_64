@@ -78,15 +78,17 @@ pub struct DivideConfiguration {
 }
 
 /// Divide value that is set in DivideConfiguration register.
+#[repr(u32)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum DivideValue {
-    Div1,
-    Div2,
-    Div4,
-    Div8,
-    Div16,
-    Div32,
-    Div64,
-    Div128,
+    Div1    = 0b1011,
+    Div2    = 0b0000,
+    Div4    = 0b0001,
+    Div8    = 0b0010,
+    Div16   = 0b0011,
+    Div32   = 0b1000,
+    Div64   = 0b1001,
+    Div128  = 0b1010,
 }
 
 impl LocalApicReg {
