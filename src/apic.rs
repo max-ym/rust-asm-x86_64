@@ -199,6 +199,12 @@ impl LocalApic {
         unsafe { &*(ptr as *const _) }
     }
 
+    /// Get timer initial count register.
+    pub fn initial_count_mut(&mut self) -> &mut TimerInitialCount {
+        let ptr = LocalApicReg::InitialCount.ptr32_mut(self);
+        unsafe { &mut *(ptr as *mut _)}
+    }
+
     /// Get divide configuration value.
     pub fn divide_configuration(&self) -> &DivideConfiguration {
         let ptr = LocalApicReg::DivideConfiguration.ptr32(self);
