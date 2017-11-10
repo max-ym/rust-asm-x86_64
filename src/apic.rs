@@ -184,6 +184,11 @@ impl LocalApic {
         let addr = self.base_addr() + Offset as usize;
         unsafe { &*(addr as *const DivideConfiguration) }
     }
+
+    /// Get divide configuration value.
+    pub fn divide_configuration_mut(&mut self) -> &mut DivideConfiguration {
+        unsafe { &mut *(self.divide_configuration() as *const _ as *mut _) }
+    }
 }
 
 impl DivideConfiguration {
