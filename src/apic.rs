@@ -127,6 +127,15 @@ pub enum DivideValue {
     Div128  = 0b1010,
 }
 
+/// TSC Deadline MSR.
+#[repr(packed)]
+pub struct TscDeadlineMsr {
+    // All dwords must be accessed separately (requirement of APIC).
+
+    a   : u32,
+    b   : u32,
+}
+
 impl LocalApicReg {
 
     /// Pointer to given local APIC register.
@@ -262,6 +271,27 @@ impl LocalApic {
     pub fn divide_configuration_mut(&mut self) -> &mut DivideConfiguration {
         unsafe { &mut *(self.divide_configuration() as *const _ as *mut _) }
     }
+
+    /// TSC Deadline MST.
+    ///
+    /// # Safety
+    /// Some systems do not have this MSR. Caller must ensure this MSR
+    /// exists.
+    pub unsafe fn unsafe_tsc_deadline_msr(&self) -> &TscDeadlineMsr {
+        let ptr = LocalApicReg::TscDeadlineMsr.ptr64(self);
+        &*(ptr as *const _)
+    }
+
+    /// TSC Deadline MST.
+    ///
+    /// # Safety
+    /// Some systems do not have this MSR. Caller must ensure this MSR
+    /// exists.
+    pub unsafe fn unsafe_tsc_deadline_msr_mut(&mut self)
+            -> &mut TscDeadlineMsr {
+        let ptr = LocalApicReg::TscDeadlineMsr.ptr64_mut(self);
+        &mut *(ptr as *mut _)
+    }
 }
 
 impl LvtTimer {
@@ -376,5 +406,29 @@ impl DivideConfiguration {
             0b1011 => Div1  ,
             _      => unreachable!()
         }
+    }
+}
+
+impl TscDeadlineMsr {
+
+    /// Whether TSC Deadline MSR is supported by the system.
+    pub fn exists() -> bool {
+        unimplemented!()
+    }
+
+    /// Set timestamp.
+    pub fn set(&mut self, timestamp: u64) {
+        self.a = (timestamp >> 00) as u32;
+        self.b = (timestamp >> 32) as u32;
+    }
+
+    /// Disarm timer.
+    pub fn disarm(&mut self) {
+        self.set(0); // Zero timestamp disarms the timer (Intel manual).
+    }
+
+    /// Current MSR value.
+    pub fn value(&self) -> u64 {
+        self.a as u64 + (self.b as u64) << 32
     }
 }
