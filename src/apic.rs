@@ -84,6 +84,19 @@ pub struct LvtTimer {
     reg     : u32,
 }
 
+/// LVT Timer mode.
+#[repr(u32)]
+#[derive(PartialEq, Clone, Copy)]
+pub enum LvtTimerMode {
+    OneShot     = 0b00 << 17,
+    Periodic    = 0b01 << 17,
+    TscDeadline = 0b10 << 17,
+}
+
+/// Mask that can be used to clear out all bits except timer mode
+/// in LVT Timer register.
+const LVT_TIMER_MODE_MASK: u32 = 0b11 << 17;
+
 /// Value of current timer count register of APIC.
 #[repr(packed)]
 pub struct TimerCurrentCount {
@@ -244,6 +257,16 @@ impl LocalApic {
     /// Get divide configuration value.
     pub fn divide_configuration_mut(&mut self) -> &mut DivideConfiguration {
         unsafe { &mut *(self.divide_configuration() as *const _ as *mut _) }
+    }
+}
+
+impl LvtTimer {
+
+    /// Current LVT Timer mode.
+    pub fn mode(&self) -> LvtTimerMode {
+        use self::LvtTimerMode::*;
+        let val = self.reg & LVT_TIMER_MODE_MASK;
+        unsafe { ::core::mem::transmute(val) }
     }
 }
 
