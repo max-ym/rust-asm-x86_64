@@ -61,6 +61,8 @@ pub enum LocalApicReg {
 
     DivideConfiguration     = 0x3E0, // RW
 
+    TscDeadlineMsr          = 0x6E0, // RW, 4
+
     // 1  - Not supported on Pentium 4 and Xeon.
     //
     // 2  - Introduced in Pentium 4 and Xeon. This APIC registers and its
@@ -70,6 +72,8 @@ pub enum LocalApicReg {
     // 3  - Introduced in Pentium Pro. This APIC register and its
     //      associated function are implementation-dependent and may not be
     //      present in future IA-32 or Intel 64 processors.
+    //
+    // 4  - Some CPUs may not support.
 }
 
 /// Value of DivideConfiguration register of APIC.
