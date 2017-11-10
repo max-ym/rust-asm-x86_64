@@ -78,6 +78,12 @@ pub struct DivideConfiguration {
     reg     : u32,
 }
 
+/// Value of current timer count register of APIC.
+#[repr(packed)]
+pub struct TimerCurrentCount {
+    reg     : u32,
+}
+
 /// Divide value that is set in DivideConfiguration register.
 #[repr(u32)]
 #[derive(PartialEq, Clone, Copy)]
