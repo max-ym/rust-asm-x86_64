@@ -193,6 +193,12 @@ impl LocalApic {
         self.apic_base_msr.write();
     }
 
+    /// Get timer initial count register.
+    pub fn initial_count(&self) -> &TimerInitialCount {
+        let ptr = LocalApicReg::InitialCount.ptr32(self);
+        unsafe { &*(ptr as *const _) }
+    }
+
     /// Get divide configuration value.
     pub fn divide_configuration(&self) -> &DivideConfiguration {
         let ptr = LocalApicReg::DivideConfiguration.ptr32(self);
