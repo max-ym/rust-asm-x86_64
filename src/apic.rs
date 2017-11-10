@@ -61,8 +61,6 @@ pub enum LocalApicReg {
 
     DivideConfiguration     = 0x3E0, // RW
 
-    TscDeadlineMsr          = 0x6E0, // RW, 4
-
     // 1  - Not supported on Pentium 4 and Xeon.
     //
     // 2  - Introduced in Pentium 4 and Xeon. This APIC registers and its
@@ -72,8 +70,6 @@ pub enum LocalApicReg {
     // 3  - Introduced in Pentium Pro. This APIC register and its
     //      associated function are implementation-dependent and may not be
     //      present in future IA-32 or Intel 64 processors.
-    //
-    // 4  - Some CPUs may not support.
 }
 
 /// Value of DivideConfiguration register of APIC.
@@ -125,15 +121,6 @@ pub enum DivideValue {
     Div32   = 0b1000,
     Div64   = 0b1001,
     Div128  = 0b1010,
-}
-
-/// TSC Deadline MSR.
-#[repr(packed)]
-pub struct TscDeadlineMsr {
-    // All dwords must be accessed separately (requirement of APIC).
-
-    a   : u32,
-    b   : u32,
 }
 
 impl LocalApicReg {
@@ -271,26 +258,6 @@ impl LocalApic {
     pub fn divide_configuration_mut(&mut self) -> &mut DivideConfiguration {
         unsafe { &mut *(self.divide_configuration() as *const _ as *mut _) }
     }
-
-    /// TSC Deadline MST.
-    ///
-    /// # Safety
-    /// Some systems do not have this MSR. Caller must ensure this MSR
-    /// exists.
-    pub unsafe fn tsc_deadline_msr(&self) -> &TscDeadlineMsr {
-        let ptr = LocalApicReg::TscDeadlineMsr.ptr64(self);
-        &*(ptr as *const _)
-    }
-
-    /// TSC Deadline MST.
-    ///
-    /// # Safety
-    /// Some systems do not have this MSR. Caller must ensure this MSR
-    /// exists.
-    pub unsafe fn tsc_deadline_msr_mut(&mut self) -> &mut TscDeadlineMsr {
-        let ptr = LocalApicReg::TscDeadlineMsr.ptr64_mut(self);
-        &mut *(ptr as *mut _)
-    }
 }
 
 impl LvtTimer {
@@ -405,29 +372,5 @@ impl DivideConfiguration {
             0b1011 => Div1  ,
             _      => unreachable!()
         }
-    }
-}
-
-impl TscDeadlineMsr {
-
-    /// Whether TSC Deadline MSR is supported by the system.
-    pub fn exists() -> bool {
-        unimplemented!()
-    }
-
-    /// Set timestamp.
-    pub fn set(&mut self, timestamp: u64) {
-        self.a = (timestamp >> 00) as u32;
-        self.b = (timestamp >> 32) as u32;
-    }
-
-    /// Disarm timer.
-    pub fn disarm(&mut self) {
-        self.set(0); // Zero timestamp disarms the timer (Intel manual).
-    }
-
-    /// Current MSR value.
-    pub fn value(&self) -> u64 {
-        self.a as u64 + (self.b as u64) << 32
     }
 }

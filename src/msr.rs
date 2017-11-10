@@ -47,7 +47,8 @@ impl Info {
 /// Model Specific Register ID list.
 #[repr(u32)]
 pub enum Msr {
-    ApicBase        = 27,
+    ApicBase        = 0x01B,
+    TscDeadline     = 0x6E0,
 }
 
 macro_rules! derive_info {
@@ -92,6 +93,7 @@ macro_rules! derive_info {
 }
 
 derive_info!(ApicBase);
+derive_info!(TscDeadline);
 
 impl ApicBase {
 
@@ -133,4 +135,28 @@ impl ApicBase {
          self.eax = a;
          self.edx = d;
      }
+}
+
+impl TscDeadline {
+
+    /// Whether TSC Deadline MSR is supported by the system.
+    pub fn exists() -> bool {
+        unimplemented!()
+    }
+
+    /// Set timestamp.
+    pub fn set(&mut self, timestamp: u64) {
+        self.eax = (timestamp >> 00) as u32;
+        self.edx = (timestamp >> 32) as u32;
+    }
+
+    /// Disarm timer.
+    pub fn disarm(&mut self) {
+        self.set(0); // Zero timestamp disarms the timer (Intel manual).
+    }
+
+    /// Current MSR value.
+    pub fn value(&self) -> u64 {
+        self.eax as u64 + (self.edx as u64) << 32
+    }
 }
