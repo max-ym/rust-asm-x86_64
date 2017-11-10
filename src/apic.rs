@@ -123,17 +123,24 @@ macro_rules! wo {
 impl LocalApic {
 
     /// Get Local APIC reference if APIC is actually available.
+    /// To determine the presence of APIC, CPUID instruction is used.
     pub fn new() -> Option<LocalApic> {
         if Self::local_apic_is_present() {
             unsafe {
-                let apic_base_msr = ApicBase::read();
-                Some(LocalApic {
-                    apic_base_msr : apic_base_msr
-                })
+                Some(Self::unsafe_new())
             }
         } else {
             None
         }
+    }
+
+    /// Get Local APIC reference.
+    ///
+    /// # Safety
+    /// Does not check whether Local APIC exists
+    /// so caller must be sure this operation is valid.
+    pub unsafe fn unsafe_new() -> LocalApic {
+        LocalApic { apic_base_msr : ApicBase::read() }
     }
 
     /// Check if local APIC is present in given system. Function
