@@ -78,6 +78,12 @@ pub struct DivideConfiguration {
     reg     : u32,
 }
 
+/// Value of Local Vector Table Timer register of APIC.
+#[repr(packed)]
+pub struct LvtTimer {
+    reg     : u32,
+}
+
 /// Value of current timer count register of APIC.
 #[repr(packed)]
 pub struct TimerCurrentCount {
@@ -191,6 +197,18 @@ impl LocalApic {
     pub unsafe fn set_base_addr(&mut self, base: usize) {
         self.apic_base_msr.set_apic_base(base as _);
         self.apic_base_msr.write();
+    }
+
+    /// LVT Timer register.
+    pub fn lvt_timer(&self) -> &LvtTimer {
+        let ptr = LocalApicReg::LvtTimer.ptr32(self);
+        unsafe { &*(ptr as *const _) }
+    }
+
+    /// LVT Timer register.
+    pub fn lvt_timer_mut(&mut self) -> &mut LvtTimer {
+        let ptr = LocalApicReg::LvtTimer.ptr32_mut(self);
+        unsafe { &mut *(ptr as *mut _) }
     }
 
     /// Get timer initial count register.
