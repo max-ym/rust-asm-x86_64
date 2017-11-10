@@ -229,6 +229,27 @@ impl LocalApic {
     }
 }
 
+impl TimerCurrentCount {
+
+    /// Get current timer value.
+    pub fn value(&self) -> u32 {
+        self.reg
+    }
+}
+
+impl TimerInitialCount {
+
+    /// Get initial timer value.
+    pub fn value(&self) -> u32 {
+        self.reg
+    }
+
+    /// Set new initial timer value.
+    pub fn set(&mut self, value: u32) {
+        self.reg = value;
+    }
+}
+
 impl DivideConfiguration {
 
     /// Set register specified value.
