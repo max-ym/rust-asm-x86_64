@@ -248,6 +248,12 @@ impl TimerInitialCount {
     pub fn set(&mut self, value: u32) {
         self.reg = value;
     }
+
+    /// Stop the timer by setting zero value.
+    pub fn stop_timer(&mut self) {
+        // This stops the timer according to Intel manual.
+        self.set(0);
+    }
 }
 
 impl DivideConfiguration {
