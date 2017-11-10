@@ -277,7 +277,7 @@ impl LocalApic {
     /// # Safety
     /// Some systems do not have this MSR. Caller must ensure this MSR
     /// exists.
-    pub unsafe fn unsafe_tsc_deadline_msr(&self) -> &TscDeadlineMsr {
+    pub unsafe fn tsc_deadline_msr(&self) -> &TscDeadlineMsr {
         let ptr = LocalApicReg::TscDeadlineMsr.ptr64(self);
         &*(ptr as *const _)
     }
@@ -287,8 +287,7 @@ impl LocalApic {
     /// # Safety
     /// Some systems do not have this MSR. Caller must ensure this MSR
     /// exists.
-    pub unsafe fn unsafe_tsc_deadline_msr_mut(&mut self)
-            -> &mut TscDeadlineMsr {
+    pub unsafe fn tsc_deadline_msr_mut(&mut self) -> &mut TscDeadlineMsr {
         let ptr = LocalApicReg::TscDeadlineMsr.ptr64_mut(self);
         &mut *(ptr as *mut _)
     }
