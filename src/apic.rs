@@ -189,9 +189,8 @@ impl LocalApic {
 
     /// Get divide configuration value.
     pub fn divide_configuration(&self) -> &DivideConfiguration {
-        use self::LocalApicReg::DivideConfiguration as Offset;
-        let addr = self.base_addr() + Offset as usize;
-        unsafe { &*(addr as *const DivideConfiguration) }
+        let ptr = LocalApicReg::DivideConfiguration.ptr32(self);
+        unsafe { &*(ptr as *const DivideConfiguration) }
     }
 
     /// Get divide configuration value.
