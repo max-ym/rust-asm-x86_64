@@ -268,6 +268,15 @@ impl LvtTimer {
         let val = self.reg & LVT_TIMER_MODE_MASK;
         unsafe { ::core::mem::transmute(val) }
     }
+
+    /// Set LVT Timer mode.
+    ///
+    /// # Safety
+    /// Caller must ensure that given mode is supported.
+    /// TSC Deadline mode is not supported on some CPUs.
+    pub unsafe fn unsafe_set_mode(&mut self, mode: LvtTimerMode) {
+        self.reg = self.reg & !LVT_TIMER_MODE_MASK | mode as u32;
+    }
 }
 
 impl TimerCurrentCount {
