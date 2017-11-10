@@ -7,7 +7,7 @@ pub struct LocalApic {
 }
 
 /// List of all local APIC registers and their addresses.
-#[repr(u64)]
+#[repr(usize)]
 #[derive(PartialEq, Clone, Copy)]
 pub enum LocalApicReg {
     Id                      = 0x020, // RW (Nehalem RO)
@@ -70,6 +70,23 @@ pub enum LocalApicReg {
     // 3  - Introduced in Pentium Pro. This APIC register and its
     //      associated function are implementation-dependent and may not be
     //      present in future IA-32 or Intel 64 processors.
+}
+
+/// Value of DivideConfiguration register of APIC.
+pub struct DivideConfiguration {
+    reg     : u32,
+}
+
+/// Divide value that is set in DivideConfiguration register.
+pub enum DivideValue {
+    Div1,
+    Div2,
+    Div4,
+    Div8,
+    Div16,
+    Div32,
+    Div64,
+    Div128,
 }
 
 impl LocalApicReg {
@@ -159,5 +176,53 @@ impl LocalApic {
     pub unsafe fn set_base_addr(&mut self, base: usize) {
         self.apic_base_msr.set_apic_base(base as _);
         self.apic_base_msr.write();
+    }
+
+    /// Get divide configuration value.
+    pub fn divide_configuration(&self) -> &DivideConfiguration {
+        use self::LocalApicReg::DivideConfiguration as Offset;
+        let addr = self.base_addr() + Offset as usize;
+        unsafe { &*(addr as *const DivideConfiguration) }
+    }
+}
+
+impl DivideConfiguration {
+
+    /// Set register specified value.
+    unsafe fn set_reg(&mut self, val: u32) {
+        self.reg = val;
+    }
+
+    /// Set specified divide value.
+    pub fn set(&mut self, div: DivideValue) {
+        use self::DivideValue::*;
+        unsafe {
+            self.set_reg(match div {
+                Div2    => 0b0000,
+                Div4    => 0b0001,
+                Div8    => 0b0010,
+                Div16   => 0b0011,
+                Div32   => 0b1000,
+                Div64   => 0b1001,
+                Div128  => 0b1010,
+                Div1    => 0b1011,
+            });
+        }
+    }
+
+    /// Get value of this register.
+    pub fn get(&self) -> DivideValue {
+        use self::DivideValue::*;
+        match self.reg {
+            0b0000 => Div2  ,
+            0b0001 => Div4  ,
+            0b0010 => Div8  ,
+            0b0011 => Div16 ,
+            0b1000 => Div32 ,
+            0b1001 => Div64 ,
+            0b1010 => Div128,
+            0b1011 => Div1  ,
+            _      => unreachable!()
+        }
     }
 }
