@@ -205,6 +205,46 @@ impl DivideConfiguration {
         unsafe { self.set_reg(div as _); }
     }
 
+    /// Set divide factor 1.
+    pub fn set_1(&mut self) {
+        self.set(DivideValue::Div1);
+    }
+
+    /// Set divide factor 2.
+    pub fn set_2(&mut self) {
+        self.set(DivideValue::Div2);
+    }
+
+    /// Set divide factor 4.
+    pub fn set_4(&mut self) {
+        self.set(DivideValue::Div4);
+    }
+
+    /// Set divide factor 8.
+    pub fn set_8(&mut self) {
+        self.set(DivideValue::Div8);
+    }
+
+    /// Set divide factor 16.
+    pub fn set_16(&mut self) {
+        self.set(DivideValue::Div16);
+    }
+
+    /// Set divide factor 32.
+    pub fn set_32(&mut self) {
+        self.set(DivideValue::Div32);
+    }
+
+    /// Set divide factor 64.
+    pub fn set_64(&mut self) {
+        self.set(DivideValue::Div64);
+    }
+
+    /// Set divide factor 128.
+    pub fn set_128(&mut self) {
+        self.set(DivideValue::Div128);
+    }
+
     /// Get value of this register.
     pub fn get(&self) -> DivideValue {
         use self::DivideValue::*;
