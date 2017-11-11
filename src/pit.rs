@@ -26,3 +26,12 @@ pub enum OperatingMode {
     Mode2_                      = 0b110,
     Mode3_                      = 0b111,
 }
+
+/// PIT access modes.
+#[repr(u8)]
+pub enum AccessMode {
+    LatchCountValue = 0b00,
+    LoByteOnly      = 0b01,
+    HiByteOnly      = 0b10,
+    LoHiByte        = 0b11,
+}
