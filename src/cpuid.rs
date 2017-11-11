@@ -169,4 +169,9 @@ impl Features {
     pub fn local_apic_is_present(&self) -> bool {
         self.info.edx & 0b0000_0000_0000_0000_0000_0001_0000_0000 != 0
     }
+
+    /// Whether APIC supports one-shot operation using TSC deadline value.
+    pub fn tsc_deadline_supported(&self) -> bool {
+        self.info.ecx & (1 << 24) != 0
+    }
 }
