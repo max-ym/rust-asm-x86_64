@@ -16,15 +16,6 @@ pub enum OperatingMode {
     HardwareTriggeredStrobe     = 0b101,
     RateGenerator2              = 0b110,
     SquareWaveGenerator2        = 0b111,
-
-    Mode0                       = 0b000,
-    Mode1                       = 0b001,
-    Mode2                       = 0b010,
-    Mode3                       = 0b011,
-    Mode4                       = 0b100,
-    Mode5                       = 0b101,
-    Mode2_                      = 0b110,
-    Mode3_                      = 0b111,
 }
 
 /// PIT access modes.
