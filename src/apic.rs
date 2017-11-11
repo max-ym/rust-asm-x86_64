@@ -251,12 +251,13 @@ impl LocalApic {
     /// Get divide configuration value.
     pub fn divide_configuration(&self) -> &DivideConfiguration {
         let ptr = LocalApicReg::DivideConfiguration.ptr32(self);
-        unsafe { &*(ptr as *const DivideConfiguration) }
+        unsafe { &*(ptr as *const _) }
     }
 
     /// Get divide configuration value.
     pub fn divide_configuration_mut(&mut self) -> &mut DivideConfiguration {
-        unsafe { &mut *(self.divide_configuration() as *const _ as *mut _) }
+        let ptr = LocalApicReg::DivideConfiguration.ptr32_mut(self);
+        unsafe { &mut *(ptr as *mut _) }
     }
 }
 
