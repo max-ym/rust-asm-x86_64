@@ -26,3 +26,17 @@ pub enum AccessMode {
     HiByteOnly      = 0b10,
     LoHiByte        = 0b11,
 }
+
+/// Status byte read from corresponding channel port.
+#[repr(packed)]
+pub struct StatusByte {
+    val     : u8,
+}
+
+impl StatusByte {
+
+    /// Read status byte from given channel.
+    pub fn read_from(chan: Channel) -> Self {
+        unimplemented!()
+    }
+}
