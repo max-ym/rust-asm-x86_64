@@ -36,3 +36,6 @@ pub mod bit;
 
 /// Control Register module.
 pub mod cr;
+
+/// Programmable Interval Timer.
+pub mod pit;
