@@ -78,6 +78,12 @@ pub struct DivideConfiguration {
     reg     : u32,
 }
 
+/// End Of Interrupt register.
+#[repr(packed)]
+pub struct Eoi {
+    reg     : u32,
+}
+
 /// Value of Local Vector Table Timer register of APIC.
 #[repr(packed)]
 pub struct LvtTimer {
@@ -212,6 +218,18 @@ impl LocalApic {
         self.apic_base_msr.write();
     }
 
+    /// EOI register.
+    pub fn eoi(&self) -> &Eoi {
+        let ptr = LocalApicReg::Eoi.ptr32(self);
+        unsafe { &*(ptr as *const _) }
+    }
+
+    /// EOI register.
+    pub fn eoi_mut(&mut self) -> &mut Eoi {
+        let ptr = LocalApicReg::Eoi.ptr32_mut(self);
+        unsafe { &mut *(ptr as *mut _) }
+    }
+
     /// LVT Timer register.
     pub fn lvt_timer(&self) -> &LvtTimer {
         let ptr = LocalApicReg::LvtTimer.ptr32(self);
@@ -258,6 +276,14 @@ impl LocalApic {
     pub fn divide_configuration_mut(&mut self) -> &mut DivideConfiguration {
         let ptr = LocalApicReg::DivideConfiguration.ptr32_mut(self);
         unsafe { &mut *(ptr as *mut _) }
+    }
+}
+
+impl Eoi {
+
+    /// Send End-Of-Interrupt signal.
+    pub fn signal(&mut self) {
+        self.reg = 0;
     }
 }
 
