@@ -140,8 +140,10 @@ impl ApicBase {
 impl TscDeadline {
 
     /// Whether TSC Deadline MSR is supported by the system.
+    ///
+    /// Is checked by calling CPUID instruction which may be slow.
     pub fn exists() -> bool {
-        unimplemented!()
+        ::cpuid::Features::get().tsc_deadline_supported()
     }
 
     /// Set timestamp.
