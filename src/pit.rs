@@ -178,7 +178,7 @@ macro_rules! pit_ch_impl {
         let cmd = Command::new(Some($channel),
                 Some(self.$pending.access), self.$pending.operating);
 
-        cmd.send();
+        unsafe { cmd.send(); }
 
         self.$ch = self.$pending;
     }
@@ -438,7 +438,12 @@ impl Command {
     }
 
     /// Send given command to command port.
-    pub fn send(self) {
+    ///
+    /// # Safety
+    /// This may change the output data type or state of PIC.
+    /// Caller must be sure that system expects new PIC mode and/or
+    /// following data reads are expecting the change.
+    pub unsafe fn send(self) {
         cmd_port().out_u8(self.into())
     }
 }
