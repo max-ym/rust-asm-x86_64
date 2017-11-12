@@ -155,6 +155,27 @@ pub struct LvtThermalSensor {
     reg     : u32,
 }
 
+/// LVT performance counters register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct LvtPerformanceCounters {
+    reg     : u32,
+}
+
+/// LVT local interrupt pin 0 register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct LvtLint0 {
+    reg     : u32,
+}
+
+/// LVT local interrupt pin 1 register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct LvtLint1 {
+    reg     : u32,
+}
+
 /// LVT Timer mode.
 #[repr(u32)]
 #[derive(PartialEq, Clone, Copy)]
@@ -555,6 +576,23 @@ impl LvtTimer {
 impl LvtThermalSensor {
     lvt_entry_impl_base!();
     lvt_entry_impl_delivery!();
+}
+
+impl LvtPerformanceCounters {
+    lvt_entry_impl_base!();
+    lvt_entry_impl_delivery!();
+}
+
+impl LvtLint0 {
+    lvt_entry_impl_base!();
+    lvt_entry_impl_delivery!();
+    lvt_entry_impl_lint!();
+}
+
+impl LvtLint1 {
+    lvt_entry_impl_base!();
+    lvt_entry_impl_delivery!();
+    lvt_entry_impl_lint!();
 }
 
 impl TimerCurrentCount {
