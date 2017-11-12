@@ -360,15 +360,19 @@ macro_rules! lvt_entry_impl_lint {
 
 macro_rules! lapic_reg_ref_impl {
     ($n:ident, $nm:ident, $ty:tt, $doc:expr) => {
+        lapic_reg_ref_impl!($ty, $n, $nm, $ty, $doc);
+    };
+
+    ($enu:ident, $n:ident, $nm:ident, $ty:tt, $doc:expr) => {
         #[doc=$doc]
         pub fn $n(&self) -> &$ty {
-            let ptr = LocalApicReg::$ty.ptr32(self);
+            let ptr = LocalApicReg::$enu.ptr32(self);
             unsafe { &*(ptr as *const _) }
         }
 
         #[doc=$doc]
         pub fn $nm(&mut self) -> &mut $ty {
-            let ptr = LocalApicReg::$ty.ptr32_mut(self);
+            let ptr = LocalApicReg::$enu.ptr32_mut(self);
             unsafe { &mut *(ptr as *mut _) }
         }
     };
@@ -427,71 +431,29 @@ impl LocalApic {
         unsafe { &mut *(ptr as *mut _) }
     }
 
-    /// Spurious interrupt vector register.
-    pub fn spurious_interrupt(&self) -> &SpuriousInterrupt {
-        let ptr = LocalApicReg::SpuriousInterruptVector.ptr32(self);
-        unsafe { &*(ptr as *const _) }
-    }
-
-    /// Spurious interrupt vector register.
-    pub fn spurious_interrupt_mut(&mut self) -> &mut SpuriousInterrupt {
-        let ptr = LocalApicReg::SpuriousInterruptVector.ptr32_mut(self);
-        unsafe { &mut *(ptr as *mut _) }
-    }
+    lapic_reg_ref_impl!(SpuriousInterruptVector,
+            spurious_interrupt, spurious_interrupt_mut,
+            SpuriousInterrupt, "Spurious interrupt vector register.");
 
     lapic_reg_ref_impl!(lvt_cmci, lvt_cmci_mut,
             LvtCmci, "LVT CMCI register.");
 
-    /// LVT Timer register.
-    pub fn lvt_timer(&self) -> &LvtTimer {
-        let ptr = LocalApicReg::LvtTimer.ptr32(self);
-        unsafe { &*(ptr as *const _) }
-    }
-
-    /// LVT Timer register.
-    pub fn lvt_timer_mut(&mut self) -> &mut LvtTimer {
-        let ptr = LocalApicReg::LvtTimer.ptr32_mut(self);
-        unsafe { &mut *(ptr as *mut _) }
-    }
+    lapic_reg_ref_impl!(lvt_timer, lvt_timer_mut,
+            LvtTimer, "LVT timer register.");
 
     lapic_reg_ref_impl!(lvt_thermal_sensor, lvt_thermal_sensor_mut,
             LvtThermalSensor, "LVT thermal sensor register.");
 
-    /// Get timer initial count register.
-    pub fn initial_count(&self) -> &TimerInitialCount {
-        let ptr = LocalApicReg::InitialCount.ptr32(self);
-        unsafe { &*(ptr as *const _) }
-    }
+    lapic_reg_ref_impl!(InitialCount,
+            initial_count, initial_count_mut,
+            TimerInitialCount, "Timer initial count register.");
 
-    /// Get timer initial count register.
-    pub fn initial_count_mut(&mut self) -> &mut TimerInitialCount {
-        let ptr = LocalApicReg::InitialCount.ptr32_mut(self);
-        unsafe { &mut *(ptr as *mut _)}
-    }
+    lapic_reg_ref_impl!(CurrentCount,
+            current_count, current_count_mut,
+            TimerCurrentCount, "Timer current count register.");
 
-    /// Get timer current count register.
-    pub fn current_count(&self) -> &TimerCurrentCount {
-        let ptr = LocalApicReg::CurrentCount.ptr32(self);
-        unsafe { &*(ptr as *const _) }
-    }
-
-    /// Get timer current count register.
-    pub fn current_count_mut(&mut self) -> &mut TimerCurrentCount {
-        let ptr = LocalApicReg::CurrentCount.ptr32_mut(self);
-        unsafe { &mut *(ptr as *mut _)}
-    }
-
-    /// Get divide configuration value.
-    pub fn divide_configuration(&self) -> &DivideConfiguration {
-        let ptr = LocalApicReg::DivideConfiguration.ptr32(self);
-        unsafe { &*(ptr as *const _) }
-    }
-
-    /// Get divide configuration value.
-    pub fn divide_configuration_mut(&mut self) -> &mut DivideConfiguration {
-        let ptr = LocalApicReg::DivideConfiguration.ptr32_mut(self);
-        unsafe { &mut *(ptr as *mut _) }
-    }
+    lapic_reg_ref_impl!(divide_configuration, divide_configuration_mut,
+            DivideConfiguration, "Divide configuration value.");
 }
 
 impl Version {
