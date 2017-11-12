@@ -400,7 +400,7 @@ impl Command {
     pub fn channel(&self) -> Option<Channel> {
         let val = self.val & 0b1100_0000;
         let val = val >> 6;
-        if (val == 0b11) {
+        if val == 0b11 {
             None // Read back command has no channel
         } else { unsafe {
             Some(::core::mem::transmute(val))
@@ -410,7 +410,7 @@ impl Command {
     pub fn access_mode(&self) -> Option<AccessMode> {
         let val = self.val & 0b0011_0000;
         let val = val >> 4;
-        if (val == 0) {
+        if val == 0 {
             None // Latch count value command.
         } else { unsafe {
             Some(::core::mem::transmute(val))
