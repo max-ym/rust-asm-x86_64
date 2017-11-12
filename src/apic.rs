@@ -291,7 +291,6 @@ impl LvtTimer {
 
     /// Current LVT Timer mode.
     pub fn mode(&self) -> LvtTimerMode {
-        use self::LvtTimerMode::*;
         let val = self.reg & LVT_TIMER_MODE_MASK;
         unsafe { ::core::mem::transmute(val) }
     }
