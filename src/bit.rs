@@ -87,13 +87,3 @@ pub fn bsf_i16(i: i16) -> Option<i16> {
         None    => None
     }
 }
-
-/// Store 'v' value 'c' times with STOSQ instruction.
-#[inline(always)]
-pub fn stosq(v: u64, c: u64) {
-    unsafe { asm!(
-    "rep stosq"
-    :: "{rax}"(v), "{rcx}"(c)
-    :: "volatile"
-    ); }
-}
