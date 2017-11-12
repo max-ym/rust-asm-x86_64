@@ -86,6 +86,7 @@ pub enum DeliveryStatus {
 
 /// Delivery mode of LVT interrupt.
 #[repr(u32)]
+#[derive(Clone, Copy)]
 pub enum DeliveryMode {
     Fixed   = 0b000,
     Smi     = 0b010,
