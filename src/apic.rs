@@ -176,6 +176,13 @@ pub struct LvtLint1 {
     reg     : u32,
 }
 
+/// LVT error interrupt register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct LvtError {
+    reg     : u32,
+}
+
 /// LVT Timer mode.
 #[repr(u32)]
 #[derive(PartialEq, Clone, Copy)]
@@ -593,6 +600,10 @@ impl LvtLint1 {
     lvt_entry_impl_base!();
     lvt_entry_impl_delivery!();
     lvt_entry_impl_lint!();
+}
+
+impl LvtError {
+    lvt_entry_impl_base!();
 }
 
 impl TimerCurrentCount {
