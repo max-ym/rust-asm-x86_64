@@ -281,6 +281,11 @@ macro_rules! lvt_entry_impl_base {
             (self.reg & 0xF) as u8
         }
 
+        /// Set LVT vector.
+        pub fn set_vector(&mut self, vec: u8) {
+            self.reg = self.reg & !0xF | (vec as u32);
+        }
+
         /// Delivery status.
         pub fn delivery_status(&self) -> DeliveryStatus {
             use self::DeliveryStatus::*;
@@ -295,6 +300,16 @@ macro_rules! lvt_entry_impl_base {
         /// Whether interrupt is masked or not.
         pub fn masked(&self) -> bool {
             self.reg & (1 << 16) != 0
+        }
+
+        /// Mask this interrupt.
+        pub fn mask(&mut self) {
+            self.reg |= 1 << 16;
+        }
+
+        /// Unmask this interrupt.
+        pub fn unmask(&mut self) {
+            self.reg &= !(1 << 16);
         }
     };
 }
