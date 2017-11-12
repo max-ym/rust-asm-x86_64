@@ -66,6 +66,12 @@ pub struct StatusByte {
     val     : u8,
 }
 
+/// Read Back command byte.
+#[repr(packed)]
+pub struct ReadBackCmd {
+    val     : u8,
+}
+
 /// Port for PIT command register.
 fn cmd_port() -> ::port::Port {
     ::port::Port::number(CMD_REG)
@@ -169,10 +175,10 @@ macro_rules! pit_ch_impl {
     pub fn $commit_settings(&mut self) {
         use self::Channel::$channel;
 
-        let status = StatusByte::new(Some($channel),
+        let cmd = ReadBackCmd::new(Some($channel),
                 Some(self.$pending.access), self.$pending.operating);
 
-        cmd_port().out_u8(status.into());
+        cmd_port().out_u8(cmd.into());
 
         self.$ch = self.$pending;
     }
@@ -310,43 +316,6 @@ impl Pit {
 
 impl StatusByte {
 
-    /// Create new status byte with given settings.
-    ///
-    /// Provided channel value is optional. If no channel is given,
-    /// this status byte will select a read-back command.
-    ///
-    /// Access is optional too. If no access given then latch command
-    /// will be seleted.
-    pub fn new_with_bcd(ch: Option<Channel>, access: Option<AccessMode>,
-            op: OperatingMode, bcd: bool) -> Self {
-        StatusByte {
-            val : {
-                (match ch {
-                    Some(t) => t as u8,
-                    None    => 0b11 // Read-back command.
-                }                           << 6)
-                | (match access {
-                    Some(t) => t as u8,
-                    None    => 0b00 // Latch command.
-                }                           << 4)
-                | ((op as u8)               << 1)
-                | (if bcd { 1 } else { 0 }  << 0)
-            }
-        }
-    }
-
-    /// Create new status byte with given settings.
-    ///
-    /// Provided channel value is optional. If no channel is given,
-    /// this status byte will select a read-back command.
-    ///
-    /// Access is optional too. If no access given then latch command
-    /// will be seleted.
-    pub fn new(ch: Option<Channel>, access: Option<AccessMode>,
-            op: OperatingMode) -> Self {
-        Self::new_with_bcd(ch, access, op, false)
-    }
-
     /// Read status byte from given channel.
     pub fn read_from(chan: Channel) -> Self {
         unimplemented!()
@@ -382,6 +351,53 @@ impl StatusByte {
 }
 
 impl Into<u8> for StatusByte {
+
+    fn into(self) -> u8 {
+        self.val
+    }
+}
+
+impl ReadBackCmd {
+
+    /// Create new status byte with given settings.
+    ///
+    /// Provided channel value is optional. If no channel is given,
+    /// this status byte will select a read-back command.
+    ///
+    /// Access is optional too. If no access given then latch command
+    /// will be seleted.
+    pub fn new_with_bcd(ch: Option<Channel>, access: Option<AccessMode>,
+            op: OperatingMode, bcd: bool) -> Self {
+        ReadBackCmd {
+            val : {
+                (match ch {
+                    Some(t) => t as u8,
+                    None    => 0b11 // Read-back command.
+                }                           << 6)
+                | (match access {
+                    Some(t) => t as u8,
+                    None    => 0b00 // Latch command.
+                }                           << 4)
+                | ((op as u8)               << 1)
+                | (if bcd { 1 } else { 0 }  << 0)
+            }
+        }
+    }
+
+    /// Create new status byte with given settings.
+    ///
+    /// Provided channel value is optional. If no channel is given,
+    /// this status byte will select a read-back command.
+    ///
+    /// Access is optional too. If no access given then latch command
+    /// will be seleted.
+    pub fn new(ch: Option<Channel>, access: Option<AccessMode>,
+            op: OperatingMode) -> Self {
+        Self::new_with_bcd(ch, access, op, false)
+    }
+}
+
+impl Into<u8> for ReadBackCmd {
 
     fn into(self) -> u8 {
         self.val
