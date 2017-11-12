@@ -4,6 +4,9 @@ const CMD_REG: u16 = 0x43;
 /// Base port number for channels. Chan0 port is 0x40, Chan1 port is 0x41 etc.
 const CH_BASE: u16 = 0x40;
 
+/// Port that has bit #0 that controls channel 2 gate.
+const CH2_GATE_PORT: u16 = 0x61;
+
 /// The channel of PIT.
 #[repr(u8)]
 #[derive(Clone, Copy)]
@@ -47,6 +50,7 @@ pub struct Pit {
     ch0     : ChannelInfo,
     //ch1     : ChannelInfo, // unimplemented on modern PCs.
     ch2     : ChannelInfo,
+    ch2gate : bool,
 }
 
 /// Status byte read from corresponding channel port.
@@ -157,6 +161,8 @@ impl Pit {
         Pit {
             ch0 : ch0,
             ch2 : ch2,
+
+            ch2gate : false,
         }
     }
 }
