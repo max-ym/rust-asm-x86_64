@@ -358,6 +358,22 @@ macro_rules! lvt_entry_impl_lint {
     }
 }
 
+macro_rules! lapic_reg_ref_impl {
+    ($n:ident, $nm:ident, $ty:tt, $doc:expr) => {
+        #[doc=$doc]
+        pub fn $n(&self) -> &$ty {
+            let ptr = LocalApicReg::$ty.ptr32(self);
+            unsafe { &*(ptr as *const _) }
+        }
+
+        #[doc=$doc]
+        pub fn $nm(&mut self) -> &mut $ty {
+            let ptr = LocalApicReg::$ty.ptr32_mut(self);
+            unsafe { &mut *(ptr as *mut _) }
+        }
+    };
+}
+
 impl LocalApic {
 
     /// Get Local APIC reference if APIC is actually available.
