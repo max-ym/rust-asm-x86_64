@@ -18,6 +18,7 @@ pub enum Channel {
 
 /// PIT operating modes.
 #[repr(u8)]
+#[derive(Clone, Copy)]
 pub enum OperatingMode {
     InterruptOnTerminalCount    = 0b000,
     HwRetriggerableOneShot      = 0b001,
@@ -31,6 +32,7 @@ pub enum OperatingMode {
 
 /// PIT access modes.
 #[repr(u8)]
+#[derive(Clone, Copy)]
 pub enum AccessMode {
     LatchCountValue = 0b00,
     LoByteOnly      = 0b01,
@@ -39,6 +41,7 @@ pub enum AccessMode {
 }
 
 /// Information about channel settings.
+#[derive(Clone, Copy)]
 struct ChannelInfo {
     pub access      : AccessMode,
     pub operating   : OperatingMode,
@@ -51,6 +54,11 @@ pub struct Pit {
     //ch1     : ChannelInfo, // unimplemented on modern PCs.
     ch2     : ChannelInfo,
     ch2gate : bool,
+
+    // Settings to apply on next write to command register for individual
+    // channels.
+    ch0_pending : ChannelInfo,
+    ch2_pending : ChannelInfo,
 }
 
 /// Status byte read from corresponding channel port.
@@ -163,7 +171,30 @@ impl Pit {
             ch2 : ch2,
 
             ch2gate : false,
+
+            ch0_pending : ch0,
+            ch2_pending : ch2,
         }
+    }
+
+    /// Change access mode for channel 0.
+    pub fn ch0_set_access(&mut self, mode: AccessMode) {
+        self.ch0_pending.access = mode;
+    }
+
+    /// Change access mode for channel 2.
+    pub fn ch2_set_access(&mut self, mode: AccessMode) {
+        self.ch2_pending.access = mode;
+    }
+
+    /// Change operating mode for channel 0.
+    pub fn ch0_set_operating(&mut self, mode: OperatingMode) {
+        self.ch0_pending.operating = mode;
+    }
+
+    /// Change operating mode for channel 2.
+    pub fn ch2_set_operating(&mut self, mode: OperatingMode) {
+        self.ch2_pending.operating = mode;
     }
 }
 
