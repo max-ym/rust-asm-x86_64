@@ -30,6 +30,7 @@ pub mod seg;
 
 /// Module related to GDT, IDT, paging tables.
 pub mod tables;
+pub use tables::{gdt, idt, paging};
 
 /// Simple bitwise operations that can be accelerated by CPU.
 pub mod bit;
