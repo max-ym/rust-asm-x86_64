@@ -244,6 +244,12 @@ impl Pit {
             }
         }}
     }
+
+    /// Commit all settings and reset initial counter.
+    pub fn ch0_commit_all(&mut self) {
+        self.ch0_commit_settings();
+        self.ch0_commit_count();
+    }
 }
 
 impl StatusByte {
