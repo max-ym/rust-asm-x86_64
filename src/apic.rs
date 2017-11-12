@@ -72,6 +72,19 @@ pub enum LocalApicReg {
     //      present in future IA-32 or Intel 64 processors.
 }
 
+/// Version register local APIC type and version number.
+pub enum VersionNumber {
+    Discrete    (u8),
+    Integrated  (u8),
+}
+
+/// Version register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct Version {
+    reg     : u32,
+}
+
 /// Value of DivideConfiguration register of APIC.
 #[repr(packed)]
 #[derive(Clone, Copy)]
@@ -168,6 +181,18 @@ impl LocalApicReg {
 
     pub fn ptr128_mut(&self, apic: &mut LocalApic) -> *mut (u64, u64) {
         self.ptr32(apic) as _
+    }
+}
+
+impl VersionNumber {
+
+    /// Create from given version number.
+    pub fn from_number(num: u8) -> Self {
+        if num <= 0xF {
+            VersionNumber::Discrete(num)
+        } else {
+            VersionNumber::Integrated(num)
+        }
     }
 }
 
@@ -300,6 +325,24 @@ impl LocalApic {
     pub fn divide_configuration_mut(&mut self) -> &mut DivideConfiguration {
         let ptr = LocalApicReg::DivideConfiguration.ptr32_mut(self);
         unsafe { &mut *(ptr as *mut _) }
+    }
+}
+
+impl Version {
+
+    /// Local APIC version number.
+    pub fn version(&self) -> VersionNumber {
+        VersionNumber::from_number((self.reg & 0xF) as _)
+    }
+
+    /// Max LVT entry count minus one.
+    pub fn max_lvt_entry(&self) -> u8 {
+        ((self.reg & 0x0F_00) >> 16) as u8
+    }
+
+    /// Check support of EOI broadcast suppression.
+    pub fn eoi_broadcast_suppression(&self) -> bool {
+        self.reg & 0x10_00 != 0
     }
 }
 
