@@ -255,6 +255,12 @@ impl LocalApic {
         self.apic_base_msr.write();
     }
 
+    /// Version register.
+    pub fn version(&self) -> &Version {
+        let ptr = LocalApicReg::Version.ptr32(self);
+        unsafe { &*(ptr as *const _) }
+    }
+
     /// EOI register.
     pub fn eoi(&self) -> &Eoi {
         let ptr = LocalApicReg::Eoi.ptr32(self);
