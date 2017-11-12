@@ -94,6 +94,18 @@ pub enum DeliveryMode {
     Init    = 0b101,
 }
 
+/// Interrupt input pin polarity.
+pub enum PinPolarity {
+    ActiveHigh,
+    ActiveLow,
+}
+
+/// LVT interrupt trigger mode.
+pub enum TriggerMode {
+    EdgeSensitive,
+    LevelSensitive,
+}
+
 /// Version register.
 #[repr(packed)]
 #[derive(Clone, Copy)]
@@ -268,6 +280,38 @@ macro_rules! lvt_entry_impl_delivery {
         /// Delivery mode.
         pub fn delivery_mode(&self) -> DeliveryMode {
             DeliveryMode::from((self.reg >> 8) & 0b111)
+        }
+    }
+}
+
+macro_rules! lvt_entry_impl_lint {
+    () => {
+
+        /// Trigger mode.
+        pub fn trigger_mode(&self) -> TriggerMode {
+            use self::TriggerMode::*;
+
+            if self.reg & (1 << 15) != 0 {
+                LevelSensitive
+            } else {
+                EdgeSensitive
+            }
+        }
+
+        /// Whether remote IRR flag is on.
+        pub fn remote_irr(&self) -> bool {
+            self.reg & (1 << 14) != 0
+        }
+
+        /// Interrupt input pin polarity.
+        pub fn input_polarity(&self) -> PinPolarity {
+            use self::PinPolarity::*;
+
+            if self.reg & (1 << 13) != 0 {
+                ActiveLow
+            } else {
+                ActiveHigh
+            }
         }
     }
 }
