@@ -144,7 +144,11 @@ macro_rules! pit_ch_impl {
             $pending:ident, $set_access:ident, $set_operating:ident,
             $set_reload:ident,
             $commit_settings:ident, $commit_reload:ident,
-            $commit_all:ident) => (
+            $commit_all:ident,
+            $reload_count:ident, $pending_reload_count:ident,
+            $access:ident, $pending_access:ident,
+            $operating:ident, $pending_operating:ident
+            ) => (
 
     /// Change access mode for channel.
     pub fn $set_access(&mut self, mode: AccessMode) {
@@ -215,6 +219,37 @@ macro_rules! pit_ch_impl {
         self.$commit_settings();
         self.$commit_reload();
     }
+
+    /// Current reload count value.
+    pub fn $reload_count(&self) -> u16 {
+        self.$ch.reload
+    }
+
+    /// Pending reload count value.
+    pub fn $pending_reload_count(&self) -> u16 {
+        self.$pending.reload
+    }
+
+    /// Current access mode.
+    pub fn $access(&self) -> AccessMode {
+        self.$ch.access
+    }
+
+    /// Pending access mode.
+    pub fn $pending_access(&self) -> AccessMode {
+        self.$pending.access
+    }
+
+    /// Current operating mode.
+    pub fn $operating(&self) -> OperatingMode {
+        self.$ch.operating
+    }
+
+    /// Pending operating mode.
+    pub fn $pending_operating(&self) -> OperatingMode {
+        self.$pending.operating
+    }
+
     );
 }
 
@@ -258,11 +293,19 @@ impl Pit {
     pit_ch_impl!(Channel0, ch0, ch0_pending, ch0_set_access,
             ch0_set_operating, ch0_set_reload,
             ch0_commit_settings, ch0_commit_reload,
-            ch0_commit_all);
+            ch0_commit_all,
+            ch0_reload_count, ch0_pending_reload_count,
+            ch0_access, ch0_pending_access,
+            ch0_operating, ch0_pending_operating
+            );
     pit_ch_impl!(Channel2, ch2, ch2_pending, ch2_set_access,
             ch2_set_operating, ch2_set_reload,
             ch2_commit_settings, ch2_commit_reload,
-            ch2_commit_all);
+            ch2_commit_all,
+            ch2_reload_count, ch2_pending_reload_count,
+            ch2_access, ch2_pending_access,
+            ch2_operating, ch2_pending_operating
+            );
 }
 
 impl StatusByte {
