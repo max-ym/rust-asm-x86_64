@@ -35,6 +35,20 @@ pub enum AccessMode {
     LoHiByte        = 0b11,
 }
 
+/// Information about channel settings.
+struct ChannelInfo {
+    pub access      : AccessMode,
+    pub operating   : OperatingMode,
+    pub reload      : u16,
+}
+
+/// PIT interface.
+pub struct Pit {
+    ch0     : ChannelInfo,
+    //ch1     : ChannelInfo, // unimplemented on modern PCs.
+    ch2     : ChannelInfo,
+}
+
 /// Status byte read from corresponding channel port.
 #[repr(packed)]
 pub struct StatusByte {
@@ -111,6 +125,39 @@ impl Channel {
     /// and that no interrupt occurs that can try to access PIT.
     pub unsafe fn set_reload_byte(&mut self, c: u8) {
         self.port().out_u8(c)
+    }
+}
+
+impl Pit {
+
+    /// Create new PIT interface. Default data may not be same as current PIT
+    /// settings.
+    ///
+    /// # Safety
+    /// Caller must understand that this interface will hold data that may
+    /// not correspond to current PIT settings. This may lead to misbehaviour
+    /// and caller can update PIT settings if needed.
+    pub unsafe fn new_no_sync() -> Self {
+        use self::AccessMode::LoHiByte;
+        use self::OperatingMode::RateGenerator;
+        use self::OperatingMode::SoftwareTriggeredStrobe;
+
+        let ch0 = ChannelInfo {
+            access      : LoHiByte,
+            operating   : RateGenerator,
+            reload      : 0, // IRQ0 with 18.2065 Hz.
+        };
+
+        let ch2 = ChannelInfo {
+            access      : LoHiByte,
+            operating   : SoftwareTriggeredStrobe,
+            reload      : 1,
+        };
+
+        Pit {
+            ch0 : ch0,
+            ch2 : ch2,
+        }
     }
 }
 
