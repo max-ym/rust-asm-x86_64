@@ -196,6 +196,11 @@ impl Pit {
     pub fn ch2_set_operating(&mut self, mode: OperatingMode) {
         self.ch2_pending.operating = mode;
     }
+
+    /// Commit pending changes to the channel 0.
+    pub fn ch0_commit(&mut self) {
+        unimplemented!()
+    }
 }
 
 impl StatusByte {
