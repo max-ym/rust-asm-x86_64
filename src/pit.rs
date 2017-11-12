@@ -145,17 +145,17 @@ macro_rules! pit_ch_impl {
             $commit_settings:ident, $commit_count:ident,
             $commit_all:ident) => (
 
-    /// Change access mode for channel 0.
+    /// Change access mode for channel.
     pub fn $set_access(&mut self, mode: AccessMode) {
         self.$pending.access = mode;
     }
 
-    /// Change operating mode for channel 0.
+    /// Change operating mode for channel.
     pub fn $set_operating(&mut self, mode: OperatingMode) {
         self.$pending.operating = mode;
     }
 
-    /// Commit pending settings to the channel 0.
+    /// Commit pending settings to the channel.
     pub fn $commit_settings(&mut self) {
         use self::Channel::$channel;
 
@@ -167,7 +167,7 @@ macro_rules! pit_ch_impl {
         self.$ch = self.$pending;
     }
 
-    /// Commit pending initial count value to channel 0.
+    /// Commit pending initial count value to channel.
     ///
     /// Value is sent according to current access mode. For example,
     /// if value contains set bits in hi and lo bytes, but access mode
