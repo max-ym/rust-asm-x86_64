@@ -74,24 +74,28 @@ pub enum LocalApicReg {
 
 /// Value of DivideConfiguration register of APIC.
 #[repr(packed)]
+#[derive(Clone, Copy)]
 pub struct DivideConfiguration {
     reg     : u32,
 }
 
 /// End Of Interrupt register.
 #[repr(packed)]
+#[derive(Clone, Copy)]
 pub struct Eoi {
     reg     : u32,
 }
 
 /// Spurious Interrupt register.
 #[repr(packed)]
+#[derive(Clone, Copy)]
 pub struct SpuriousInterrupt {
     reg     : u32,
 }
 
 /// Value of Local Vector Table Timer register of APIC.
 #[repr(packed)]
+#[derive(Clone, Copy)]
 pub struct LvtTimer {
     reg     : u32,
 }
@@ -111,12 +115,14 @@ const LVT_TIMER_MODE_MASK: u32 = 0b11 << 17;
 
 /// Value of current timer count register of APIC.
 #[repr(packed)]
+#[derive(Clone, Copy)]
 pub struct TimerCurrentCount {
     reg     : u32,
 }
 
 /// Value of initial timer counter register of APIC.
 #[repr(packed)]
+#[derive(Clone, Copy)]
 pub struct TimerInitialCount {
     reg     : u32,
 }
