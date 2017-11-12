@@ -134,6 +134,13 @@ pub struct SpuriousInterrupt {
     reg     : u32,
 }
 
+/// LVT CMCI register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct LvtCmci {
+    reg     : u32,
+}
+
 /// Value of Local Vector Table Timer register of APIC.
 #[repr(packed)]
 #[derive(Clone, Copy)]
@@ -513,6 +520,11 @@ impl SpuriousInterrupt {
     pub fn software_disable_apic(&mut self) {
         self.reg &= !0b0001_0000_0000;
     }
+}
+
+impl LvtCmci {
+    lvt_entry_impl_base!();
+    lvt_entry_impl_delivery!();
 }
 
 impl LvtTimer {
