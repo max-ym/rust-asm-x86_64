@@ -563,6 +563,7 @@ impl LvtCmci {
 }
 
 impl LvtTimer {
+    lvt_entry_impl_base!();
 
     /// Current LVT Timer mode.
     pub fn mode(&self) -> LvtTimerMode {
