@@ -53,7 +53,7 @@ impl Channel {
         ::port::Port::number(CMD_REG)
     }
 
-    /// Current count value.
+    /// Current count value in lo/hi access mode.
     ///
     /// # Safety
     /// Use only for lo/hi access mode, otherwise bad data will be read.
@@ -72,7 +72,21 @@ impl Channel {
         lo | (hi << 8)
     }
 
-    /// Set new reload value.
+    /// Current count value in lo OR hi access mode. Function
+    /// returns appropriate byte which is either lo or hi according to
+    /// current mode.
+    ///
+    /// # Safety
+    /// Use only for lo OR hi access mode, otherwise bad data will be read
+    /// and next reads will get corrupted.
+    /// No other commands to PIT are allowed while running this function.
+    /// Caller must ensure that other CPUs don't access PIT in the meantime
+    /// and that no interrupt occurs that can try to access PIT.
+    pub unsafe fn current_count_byte(&self) -> u8 {
+        self.port().in_u8()
+    }
+
+    /// Set new reload value in lo_hi access mode.
     ///
     /// # Safety
     /// Use only for lo/hi access mode, otherwise bad data will be wrote.
@@ -85,6 +99,18 @@ impl Channel {
         // Send lo and hi bytes.
         port.out_u8((c >> 0) as _);
         port.out_u8((c >> 8) as _);
+    }
+
+    /// Set new reload value in lo or hi access mode.
+    ///
+    /// # Safety
+    /// Use only for lo OR hi access mode, otherwise bad data will be set
+    /// and next read/write operations will get corrupted.
+    /// No other commands to PIT are allowed while running this function.
+    /// Caller must ensure that other CPUs don't access PIT in the meantime
+    /// and that no interrupt occurs that can try to access PIT.
+    pub unsafe fn set_reload_byte(&mut self, c: u8) {
+        self.port().out_u8(c)
     }
 }
 
