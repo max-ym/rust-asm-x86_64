@@ -273,24 +273,6 @@ impl From<u32> for DeliveryMode {
     }
 }
 
-// Macro to create basic getter functions for local APIC registers.
-macro_rules! ro {
-    ($x:tt, $y:tt) => {
-        pub fn $y(&self) -> u32 {
-            Self::val(LocalApicReg::$x)
-        }
-    };
-}
-
-// Macro to create basic setter functions for local APIC registers.
-macro_rules! wo {
-    ($x:tt, $y:tt) => {
-        pub fn $y(&self, val: u32) {
-            Self::sval(LocalApicReg::$x, val)
-        }
-    };
-}
-
 macro_rules! lvt_entry_impl_base {
     () => {
 
