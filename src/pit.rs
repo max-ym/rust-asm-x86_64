@@ -139,6 +139,79 @@ impl Channel {
     }
 }
 
+macro_rules! pit_ch_impl {
+    ($channel:ident, $ch:ident,
+            $pending:ident, $set_access:ident, $set_operating:ident,
+            $commit_settings:ident, $commit_count:ident,
+            $commit_all:ident) => (
+
+    /// Change access mode for channel 0.
+    pub fn $set_access(&mut self, mode: AccessMode) {
+        self.$pending.access = mode;
+    }
+
+    /// Change operating mode for channel 0.
+    pub fn $set_operating(&mut self, mode: OperatingMode) {
+        self.$pending.operating = mode;
+    }
+
+    /// Commit pending settings to the channel 0.
+    pub fn $commit_settings(&mut self) {
+        use self::Channel::$channel;
+
+        let status = StatusByte::new(Some($channel),
+                Some(self.$pending.access), self.$pending.operating);
+
+        cmd_port().out_u8(status.into());
+
+        self.$ch = self.$pending;
+    }
+
+    /// Commit pending initial count value to channel 0.
+    ///
+    /// Value is sent according to current access mode. For example,
+    /// if value contains set bits in hi and lo bytes, but access mode
+    /// allows storing only hi byte, the value of lo byte will not be
+    /// updated. However, current value of this Pit interface is updated
+    /// to the same value as the PIT taking into account current access mode.
+    /// Value of pending count of the interface is not changed and lo/hi parts
+    /// are not discarded even when they aren't updated in PIT due to access
+    /// mode.
+    pub fn $commit_count(&mut self) {
+        use self::AccessMode::*;
+        use self::Channel::$channel;
+
+        unsafe { match self.$ch.access {
+
+            LoByteOnly => {
+                let reload = self.$pending.reload & 0x00FF;
+                $channel.set_reload_byte(reload as u8);
+
+                self.$ch.reload = reload;
+            },
+
+            HiByteOnly => {
+                let reload = self.$pending.reload & 0xFF00;
+                $channel.set_reload_byte((reload >> 8) as _);
+
+                self.$ch.reload = reload;
+            },
+
+            LoHiByte => {
+                $channel.set_reload(self.$pending.reload);
+                self.$ch.reload = self.$pending.reload;
+            }
+        }}
+    }
+
+    /// Commit all settings and reset initial counter.
+    pub fn $commit_all(&mut self) {
+        self.$commit_settings();
+        self.$commit_count();
+    }
+    );
+}
+
 impl Pit {
 
     /// Create new PIT interface. Default data may not be same as current PIT
@@ -176,80 +249,9 @@ impl Pit {
         }
     }
 
-    /// Change access mode for channel 0.
-    pub fn ch0_set_access(&mut self, mode: AccessMode) {
-        self.ch0_pending.access = mode;
-    }
-
-    /// Change access mode for channel 2.
-    pub fn ch2_set_access(&mut self, mode: AccessMode) {
-        self.ch2_pending.access = mode;
-    }
-
-    /// Change operating mode for channel 0.
-    pub fn ch0_set_operating(&mut self, mode: OperatingMode) {
-        self.ch0_pending.operating = mode;
-    }
-
-    /// Change operating mode for channel 2.
-    pub fn ch2_set_operating(&mut self, mode: OperatingMode) {
-        self.ch2_pending.operating = mode;
-    }
-
-    /// Commit pending settings to the channel 0.
-    pub fn ch0_commit_settings(&mut self) {
-        use self::Channel::Channel0;
-
-        let status = StatusByte::new(Some(Channel0),
-                Some(self.ch0_pending.access), self.ch0_pending.operating);
-
-        cmd_port().out_u8(status.into());
-
-        self.ch0 = self.ch0_pending;
-    }
-
-    /// Commit pending initial count value to channel 0.
-    ///
-    /// Value is sent according to current access mode. For example,
-    /// if value contains set bits in hi and lo bytes, but access mode
-    /// allows storing only hi byte, the value of lo byte will not be
-    /// updated. However, current value of this Pit interface is updated
-    /// to the same value as the PIT taking into account current access mode.
-    /// Value of pending count of the interface is not changed and lo/hi parts
-    /// are not discarded even when they aren't updated in PIT due to access
-    /// mode.
-    pub fn ch0_commit_count(&mut self) {
-        use self::AccessMode::*;
-        use self::Channel::Channel0;
-
-        unsafe { match self.ch0.access {
-
-            LoByteOnly => {
-                let reload = self.ch0_pending.reload & 0x00FF;
-                Channel0.set_reload_byte(reload as u8);
-
-                self.ch0.reload = reload;
-            },
-
-            HiByteOnly => {
-                let reload = self.ch0_pending.reload & 0xFF00;
-                Channel0.set_reload_byte((reload >> 8) as _);
-
-                self.ch0.reload = reload;
-            },
-
-            LoHiByte => {
-                Channel0.set_reload(self.ch0_pending.reload);
-                self.ch0.reload = self.ch0_pending.reload;
-            }
-        }}
-    }
-
-    /// Commit all settings and reset initial counter.
-    pub fn ch0_commit_all(&mut self) {
-        self.ch0_commit_settings();
-        self.ch0_commit_count();
-    }
+    pit_ch_impl!(Channel0, ch0, ch0_pending, ch0_set_access,
+            ch0_set_operating, ch0_commit_settings, ch0_commit_count,
+            ch0_commit_all);
 }
 
 impl StatusByte {
