@@ -252,6 +252,9 @@ impl Pit {
     pit_ch_impl!(Channel0, ch0, ch0_pending, ch0_set_access,
             ch0_set_operating, ch0_commit_settings, ch0_commit_count,
             ch0_commit_all);
+    pit_ch_impl!(Channel2, ch2, ch2_pending, ch2_set_access,
+            ch2_set_operating, ch2_commit_settings, ch2_commit_count,
+            ch2_commit_all);
 }
 
 impl StatusByte {
