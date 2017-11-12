@@ -68,7 +68,7 @@ pub struct StatusByte {
 
 /// Read Back command byte.
 #[repr(packed)]
-pub struct ReadBackCmd {
+pub struct Command {
     val     : u8,
 }
 
@@ -175,10 +175,10 @@ macro_rules! pit_ch_impl {
     pub fn $commit_settings(&mut self) {
         use self::Channel::$channel;
 
-        let cmd = ReadBackCmd::new(Some($channel),
+        let cmd = Command::new(Some($channel),
                 Some(self.$pending.access), self.$pending.operating);
 
-        cmd_port().out_u8(cmd.into());
+        cmd.send();
 
         self.$ch = self.$pending;
     }
@@ -364,7 +364,7 @@ impl Into<u8> for StatusByte {
     }
 }
 
-impl ReadBackCmd {
+impl Command {
 
     /// Create new status byte with given settings.
     ///
@@ -375,7 +375,7 @@ impl ReadBackCmd {
     /// will be seleted.
     pub fn new_with_bcd(ch: Option<Channel>, access: Option<AccessMode>,
             op: OperatingMode, bcd: bool) -> Self {
-        ReadBackCmd {
+        Command {
             val : {
                 (match ch {
                     Some(t) => t as u8,
@@ -383,7 +383,7 @@ impl ReadBackCmd {
                 }                           << 6)
                 | (match access {
                     Some(t) => t as u8,
-                    None    => 0b00 // Latch command.
+                    None    => 0b00 // Latch count value command.
                 }                           << 4)
                 | ((op as u8)               << 1)
                 | (if bcd { 1 } else { 0 }  << 0)
@@ -403,10 +403,24 @@ impl ReadBackCmd {
         Self::new_with_bcd(ch, access, op, false)
     }
 
-    pub fn access_mode(&self) -> AccessMode {
+    pub fn channel(&self) -> Option<Channel> {
+        let val = self.val & 0b1100_0000;
+        let val = val >> 6;
+        if (val == 0b11) {
+            None // Read back command has no channel
+        } else { unsafe {
+            Some(::core::mem::transmute(val))
+        }}
+    }
+
+    pub fn access_mode(&self) -> Option<AccessMode> {
         let val = self.val & 0b0011_0000;
         let val = val >> 4;
-        unsafe { ::core::mem::transmute(val) }
+        if (val == 0) {
+            None // Latch count value command.
+        } else { unsafe {
+            Some(::core::mem::transmute(val))
+        }}
     }
 
     pub fn operating_mode(&self) -> OperatingMode {
@@ -422,9 +436,14 @@ impl ReadBackCmd {
     pub fn is_binary_mode(&self) -> bool {
         self.val & 0b0000_0001 == 0
     }
+
+    /// Send given command to command port.
+    pub fn send(self) {
+        cmd_port().out_u8(self.into())
+    }
 }
 
-impl Into<u8> for ReadBackCmd {
+impl Into<u8> for Command {
 
     fn into(self) -> u8 {
         self.val
