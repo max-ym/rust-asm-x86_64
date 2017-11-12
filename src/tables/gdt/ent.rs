@@ -3,12 +3,14 @@ use super::*;
 /// The first descriptor in GDT is null.
 #[repr(packed)]
 #[derive(Clone, Copy)]
+#[allow(dead_code)]
 pub struct NullDescriptor {
     null    : u64
 }
 
 #[repr(packed)]
 #[derive(Clone, Copy)]
+#[allow(dead_code)]
 pub struct CallGateDescriptor {
     offset0 : u16,
     segsel  : u16,
@@ -20,6 +22,7 @@ pub struct CallGateDescriptor {
 
 #[repr(packed)]
 #[derive(Clone, Copy)]
+#[allow(dead_code)]
 pub struct TssDescriptor {
     limit   : u16,
     base0   : u16,
@@ -32,6 +35,7 @@ pub struct TssDescriptor {
 
 #[repr(packed)]
 #[derive(Clone, Copy)]
+#[allow(dead_code)]
 pub struct LdtDescriptor {
     limit   : u16,
     base0   : u16,
