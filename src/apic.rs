@@ -78,6 +78,12 @@ pub enum VersionNumber {
     Integrated  (u8),
 }
 
+/// Delivery status of LVT interrupts.
+pub enum DeliveryStatus {
+    Idle,
+    SendPending,
+}
+
 /// Version register.
 #[repr(packed)]
 #[derive(Clone, Copy)]
@@ -210,6 +216,32 @@ macro_rules! wo {
     ($x:tt, $y:tt) => {
         pub fn $y(&self, val: u32) {
             Self::sval(LocalApicReg::$x, val)
+        }
+    };
+}
+
+macro_rules! lvt_entry_impl_base {
+    () => {
+
+        /// LVT vector.
+        pub fn vector(&self) -> u8 {
+            (self.reg & 0xF) as u8
+        }
+
+        /// Delivery status.
+        pub fn delivery_status(&self) -> DeliveryStatus {
+            use self::DeliveryStatus::*;
+
+            if self.reg & (1 << 12) != 0 {
+                SendPending
+            } else {
+                Idle
+            }
+        }
+
+        /// Whether interrupt is masked or not.
+        pub fn masked(&self) -> bool {
+            self.reg & (1 << 16) != 0
         }
     };
 }
