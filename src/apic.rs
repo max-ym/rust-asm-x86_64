@@ -84,6 +84,12 @@ pub struct Eoi {
     reg     : u32,
 }
 
+/// Spurious Interrupt register.
+#[repr(packed)]
+pub struct SpuriousInterrupt {
+    reg     : u32,
+}
+
 /// Value of Local Vector Table Timer register of APIC.
 #[repr(packed)]
 pub struct LvtTimer {
@@ -284,6 +290,65 @@ impl Eoi {
     /// Send End-Of-Interrupt signal.
     pub fn signal(&mut self) {
         self.reg = 0;
+    }
+}
+
+impl SpuriousInterrupt {
+
+    /// Spurious interrupt vector.
+    pub fn vector(&self) -> u8 {
+        (self.reg & 0xFF) as _
+    }
+
+    /// Set spurious interrupt vector.
+    pub fn set_vector(&mut self, vec: u8) {
+        self.reg = self.reg & !0xFF | (vec as u32);
+    }
+
+    /// EOI broadcast suppression.
+    pub fn eoi_broadcast_suppression(&self) -> bool {
+        self.reg & 0b1_0000_0000_0000 != 0
+    }
+
+    /// Enable EOI broadcast suppression.
+    ///
+    /// # Safety
+    /// Not supported on some CPUs.
+    pub unsafe fn enable_eoi_broadcast_suppression(&mut self) {
+        self.reg |= 0b1_0000_0000_0000;
+    }
+
+    pub fn disable_eoi_broadcast_suppression(&mut self) {
+        self.reg &= !0b1_0000_0000_0000;
+    }
+
+    pub fn focus_processor_checking(&self) -> bool {
+        // NOTE if flag is zero then checking is enabled!
+        self.reg & 0b0010_0000_0000 == 0
+    }
+
+    pub fn enable_focus_processor_checking(&mut self) {
+        self.reg &= !0b0010_0000_0000;
+    }
+
+    /// Disable focus processor checking.
+    ///
+    /// # Safety
+    /// Not supported on Pentium 4 and Xeon processors.
+    pub unsafe fn disable_focus_processor_checking(&mut self) {
+        self.reg |= 0b0010_0000_0000;
+    }
+
+    pub fn is_apic_software_enabled(&self) -> bool {
+        self.reg & 0b0001_0000_0000 != 0
+    }
+
+    pub fn software_enable_apic(&mut self) {
+        self.reg |= 0b0001_0000_0000;
+    }
+
+    pub fn software_disable_apic(&mut self) {
+        self.reg &= !0b0001_0000_0000;
     }
 }
 
