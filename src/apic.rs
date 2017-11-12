@@ -148,6 +148,13 @@ pub struct LvtTimer {
     reg     : u32,
 }
 
+/// LVT Thermal Sensor register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct LvtThermalSensor {
+    reg     : u32,
+}
+
 /// LVT Timer mode.
 #[repr(u32)]
 #[derive(PartialEq, Clone, Copy)]
@@ -543,6 +550,11 @@ impl LvtTimer {
     pub unsafe fn set_mode(&mut self, mode: LvtTimerMode) {
         self.reg = self.reg & !LVT_TIMER_MODE_MASK | mode as u32;
     }
+}
+
+impl LvtThermalSensor {
+    lvt_entry_impl_base!();
+    lvt_entry_impl_delivery!();
 }
 
 impl TimerCurrentCount {
