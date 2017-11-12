@@ -320,6 +320,13 @@ macro_rules! lvt_entry_impl_delivery {
         pub fn delivery_mode(&self) -> DeliveryMode {
             DeliveryMode::from((self.reg >> 8) & 0b111)
         }
+
+        /// Set delivery mode without checking other fields for valid values.
+        pub unsafe fn only_set_delivery_mode(&mut self, mode: DeliveryMode) {
+            let val = mode as u32;
+            let mask = val << 8;
+            self.reg = self.reg & !(0b111 << 8) | mask;
+        }
     }
 }
 
