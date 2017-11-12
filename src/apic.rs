@@ -439,6 +439,9 @@ impl LocalApic {
         unsafe { &mut *(ptr as *mut _) }
     }
 
+    lapic_reg_ref_impl!(lvt_cmci, lvt_cmci_mut,
+            LvtCmci, "LVT CMCI register.");
+
     /// LVT Timer register.
     pub fn lvt_timer(&self) -> &LvtTimer {
         let ptr = LocalApicReg::LvtTimer.ptr32(self);
@@ -450,6 +453,9 @@ impl LocalApic {
         let ptr = LocalApicReg::LvtTimer.ptr32_mut(self);
         unsafe { &mut *(ptr as *mut _) }
     }
+
+    lapic_reg_ref_impl!(lvt_thermal_sensor, lvt_thermal_sensor_mut,
+            LvtThermalSensor, "LVT thermal sensor register.");
 
     /// Get timer initial count register.
     pub fn initial_count(&self) -> &TimerInitialCount {
