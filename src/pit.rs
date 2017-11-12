@@ -142,7 +142,8 @@ impl Channel {
 macro_rules! pit_ch_impl {
     ($channel:ident, $ch:ident,
             $pending:ident, $set_access:ident, $set_operating:ident,
-            $commit_settings:ident, $commit_count:ident,
+            $set_reload:ident,
+            $commit_settings:ident, $commit_reload:ident,
             $commit_all:ident) => (
 
     /// Change access mode for channel.
@@ -153,6 +154,11 @@ macro_rules! pit_ch_impl {
     /// Change operating mode for channel.
     pub fn $set_operating(&mut self, mode: OperatingMode) {
         self.$pending.operating = mode;
+    }
+
+    /// Set reload count value.
+    pub fn $set_reload(&mut self, value: u16) {
+        self.$pending.reload = value;
     }
 
     /// Commit pending settings to the channel.
@@ -167,7 +173,7 @@ macro_rules! pit_ch_impl {
         self.$ch = self.$pending;
     }
 
-    /// Commit pending initial count value to channel.
+    /// Commit pending reload count value to channel.
     ///
     /// Value is sent according to current access mode. For example,
     /// if value contains set bits in hi and lo bytes, but access mode
@@ -177,7 +183,7 @@ macro_rules! pit_ch_impl {
     /// Value of pending count of the interface is not changed and lo/hi parts
     /// are not discarded even when they aren't updated in PIT due to access
     /// mode.
-    pub fn $commit_count(&mut self) {
+    pub fn $commit_reload(&mut self) {
         use self::AccessMode::*;
         use self::Channel::$channel;
 
@@ -207,7 +213,7 @@ macro_rules! pit_ch_impl {
     /// Commit all settings and reset initial counter.
     pub fn $commit_all(&mut self) {
         self.$commit_settings();
-        self.$commit_count();
+        self.$commit_reload();
     }
     );
 }
@@ -250,10 +256,12 @@ impl Pit {
     }
 
     pit_ch_impl!(Channel0, ch0, ch0_pending, ch0_set_access,
-            ch0_set_operating, ch0_commit_settings, ch0_commit_count,
+            ch0_set_operating, ch0_set_reload,
+            ch0_commit_settings, ch0_commit_reload,
             ch0_commit_all);
     pit_ch_impl!(Channel2, ch2, ch2_pending, ch2_set_access,
-            ch2_set_operating, ch2_commit_settings, ch2_commit_count,
+            ch2_set_operating, ch2_set_reload,
+            ch2_commit_settings, ch2_commit_reload,
             ch2_commit_all);
 }
 
