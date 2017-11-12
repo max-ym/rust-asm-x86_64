@@ -395,6 +395,26 @@ impl ReadBackCmd {
             op: OperatingMode) -> Self {
         Self::new_with_bcd(ch, access, op, false)
     }
+
+    pub fn access_mode(&self) -> AccessMode {
+        let val = self.val & 0b0011_0000;
+        let val = val >> 4;
+        unsafe { ::core::mem::transmute(val) }
+    }
+
+    pub fn operating_mode(&self) -> OperatingMode {
+        let val = self.val & 0b0000_1110;
+        let val = val >> 1;
+        unsafe { ::core::mem::transmute(val) }
+    }
+
+    pub fn is_bcd_mode(&self) -> bool {
+        self.val & 0b0000_0001 == 1
+    }
+
+    pub fn is_binary_mode(&self) -> bool {
+        self.val & 0b0000_0001 == 0
+    }
 }
 
 impl Into<u8> for ReadBackCmd {
