@@ -262,12 +262,6 @@ impl LocalApic {
     }
 
     /// EOI register.
-    pub fn eoi(&self) -> &Eoi {
-        let ptr = LocalApicReg::Eoi.ptr32(self);
-        unsafe { &*(ptr as *const _) }
-    }
-
-    /// EOI register.
     pub fn eoi_mut(&mut self) -> &mut Eoi {
         let ptr = LocalApicReg::Eoi.ptr32_mut(self);
         unsafe { &mut *(ptr as *mut _) }
