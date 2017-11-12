@@ -7,6 +7,7 @@ pub use self::gates::*;
 /// Interrupt Descriptor Table. Raw structure to represent actual table in
 /// the memory. Use IdtCtrl to edit IDT.
 #[repr(packed)]
+#[allow(dead_code)]
 pub struct Idt {
 
     /// The array of all 256 gates of the IDT.
