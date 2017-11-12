@@ -236,6 +236,18 @@ impl LocalApic {
         unsafe { &mut *(ptr as *mut _) }
     }
 
+    /// Spurious interrupt vector register.
+    pub fn spurious_interrupt(&self) -> &SpuriousInterrupt {
+        let ptr = LocalApicReg::SpuriousInterruptVector.ptr32(self);
+        unsafe { &*(ptr as *const _) }
+    }
+
+    /// Spurious interrupt vector register.
+    pub fn spurious_interrupt_mut(&mut self) -> &mut SpuriousInterrupt {
+        let ptr = LocalApicReg::SpuriousInterruptVector.ptr32_mut(self);
+        unsafe { &mut *(ptr as *mut _) }
+    }
+
     /// LVT Timer register.
     pub fn lvt_timer(&self) -> &LvtTimer {
         let ptr = LocalApicReg::LvtTimer.ptr32(self);
