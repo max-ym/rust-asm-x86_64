@@ -84,6 +84,16 @@ pub enum DeliveryStatus {
     SendPending,
 }
 
+/// Delivery mode of LVT interrupt.
+#[repr(u32)]
+pub enum DeliveryMode {
+    Fixed   = 0b000,
+    Smi     = 0b010,
+    Nmi     = 0b100,
+    ExtInt  = 0b111,
+    Init    = 0b101,
+}
+
 /// Version register.
 #[repr(packed)]
 #[derive(Clone, Copy)]
@@ -202,6 +212,13 @@ impl VersionNumber {
     }
 }
 
+impl From<u32> for DeliveryMode {
+
+    fn from(v: u32) -> DeliveryMode {
+        unsafe { ::core::mem::transmute(v) }
+    }
+}
+
 // Macro to create basic getter functions for local APIC registers.
 macro_rules! ro {
     ($x:tt, $y:tt) => {
@@ -244,6 +261,15 @@ macro_rules! lvt_entry_impl_base {
             self.reg & (1 << 16) != 0
         }
     };
+}
+
+macro_rules! lvt_entry_impl_delivery {
+    () => {
+        /// Delivery mode.
+        pub fn delivery_mode(&self) -> DeliveryMode {
+            DeliveryMode::from((self.reg >> 8) & 0b111)
+        }
+    }
 }
 
 impl LocalApic {
