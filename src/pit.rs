@@ -317,8 +317,15 @@ impl Pit {
 impl StatusByte {
 
     /// Read status byte from given channel.
-    pub fn read_from(chan: Channel) -> Self {
-        unimplemented!()
+    ///
+    /// # Safety
+    /// Caller must be sure that given channel port is currently
+    /// holding status byte. Otherwise read data will be of other type
+    /// and given structure will be invalid. Furthermore, it may corrupt
+    /// following reads.
+    pub unsafe fn read_from(chan: Channel) -> Self {
+        let val = chan.port().in_u8();
+        StatusByte { val:val }
     }
 
     pub fn output_pin_state(&self) -> bool {
