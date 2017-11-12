@@ -34,7 +34,6 @@ pub enum OperatingMode {
 #[repr(u8)]
 #[derive(Clone, Copy)]
 pub enum AccessMode {
-    LatchCountValue = 0b00,
     LoByteOnly      = 0b01,
     HiByteOnly      = 0b10,
     LoHiByte        = 0b11,
@@ -67,16 +66,16 @@ pub struct StatusByte {
     val     : u8,
 }
 
+/// Port for PIT command register.
+fn cmd_port() -> ::port::Port {
+    ::port::Port::number(CMD_REG)
+}
+
 impl Channel {
 
     /// Port for this channel.
     pub fn port(&self) -> ::port::Port {
         ::port::Port::number(CH_BASE + *self as u8 as u16)
-    }
-
-    /// Port for PIT command register.
-    fn cmd_port() -> ::port::Port {
-        ::port::Port::number(CMD_REG)
     }
 
     /// Current count value in lo/hi access mode.
@@ -90,7 +89,7 @@ impl Channel {
         let chan_port = self.port();
 
         // Send latch command for this channel.
-        Self::cmd_port().out_u8((*self as u8) << 6);
+        cmd_port().out_u8((*self as u8) << 6);
 
         // Read lo and hi bytes from port.
         let lo = chan_port.in_u8() as u16;
@@ -197,9 +196,16 @@ impl Pit {
         self.ch2_pending.operating = mode;
     }
 
-    /// Commit pending changes to the channel 0.
-    pub fn ch0_commit(&mut self) {
-        unimplemented!()
+    /// Commit pending settings to the channel 0.
+    pub fn ch0_commit_settings(&mut self) {
+        use self::Channel::Channel0;
+
+        let status = StatusByte::new(Some(Channel0),
+                Some(self.ch0_pending.access), self.ch0_pending.operating);
+
+        cmd_port().out_u8(status.into());
+
+        self.ch0 = self.ch0_pending;
     }
 }
 
@@ -209,7 +215,10 @@ impl StatusByte {
     ///
     /// Provided channel value is optional. If no channel is given,
     /// this status byte will select a read-back command.
-    pub fn new_with_bcd(ch: Option<Channel>, access: AccessMode,
+    ///
+    /// Access is optional too. If no access given then latch command
+    /// will be seleted.
+    pub fn new_with_bcd(ch: Option<Channel>, access: Option<AccessMode>,
             op: OperatingMode, bcd: bool) -> Self {
         StatusByte {
             val : {
@@ -217,7 +226,10 @@ impl StatusByte {
                     Some(t) => t as u8,
                     None    => 0b11 // Read-back command.
                 }                           << 6)
-                | ((access as u8)           << 4)
+                | (match access {
+                    Some(t) => t as u8,
+                    None    => 0b00 // Latch command.
+                }                           << 4)
                 | ((op as u8)               << 1)
                 | (if bcd { 1 } else { 0 }  << 0)
             }
@@ -228,7 +240,10 @@ impl StatusByte {
     ///
     /// Provided channel value is optional. If no channel is given,
     /// this status byte will select a read-back command.
-    pub fn new(ch: Option<Channel>, access: AccessMode,
+    ///
+    /// Access is optional too. If no access given then latch command
+    /// will be seleted.
+    pub fn new(ch: Option<Channel>, access: Option<AccessMode>,
             op: OperatingMode) -> Self {
         Self::new_with_bcd(ch, access, op, false)
     }
@@ -264,5 +279,12 @@ impl StatusByte {
 
     pub fn is_binary_mode(&self) -> bool {
         self.val & 0b0000_0001 == 0
+    }
+}
+
+impl Into<u8> for StatusByte {
+
+    fn into(self) -> u8 {
+        self.val
     }
 }
