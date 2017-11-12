@@ -207,6 +207,43 @@ impl Pit {
 
         self.ch0 = self.ch0_pending;
     }
+
+    /// Commit pending initial count value to channel 0.
+    ///
+    /// Value is sent according to current access mode. For example,
+    /// if value contains set bits in hi and lo bytes, but access mode
+    /// allows storing only hi byte, the value of lo byte will not be
+    /// updated. However, current value of this Pit interface is updated
+    /// to the same value as the PIT taking into account current access mode.
+    /// Value of pending count of the interface is not changed and lo/hi parts
+    /// are not discarded even when they aren't updated in PIT due to access
+    /// mode.
+    pub fn ch0_commit_count(&mut self) {
+        use self::AccessMode::*;
+        use self::Channel::Channel0;
+
+        unsafe { match self.ch0.access {
+
+            LoByteOnly => {
+                let reload = self.ch0_pending.reload & 0x00FF;
+                Channel0.set_reload_byte(reload as u8);
+
+                self.ch0.reload = reload;
+            },
+
+            HiByteOnly => {
+                let reload = self.ch0_pending.reload & 0xFF00;
+                Channel0.set_reload_byte((reload >> 8) as _);
+
+                self.ch0.reload = reload;
+            },
+
+            LoHiByte => {
+                Channel0.set_reload(self.ch0_pending.reload);
+                self.ch0.reload = self.ch0_pending.reload;
+            }
+        }}
+    }
 }
 
 impl StatusByte {
