@@ -205,6 +205,34 @@ impl Pit {
 
 impl StatusByte {
 
+    /// Create new status byte with given settings.
+    ///
+    /// Provided channel value is optional. If no channel is given,
+    /// this status byte will select a read-back command.
+    pub fn new_with_bcd(ch: Option<Channel>, access: AccessMode,
+            op: OperatingMode, bcd: bool) -> Self {
+        StatusByte {
+            val : {
+                (match ch {
+                    Some(t) => t as u8,
+                    None    => 0b11 // Read-back command.
+                }                           << 6)
+                | ((access as u8)           << 4)
+                | ((op as u8)               << 1)
+                | (if bcd { 1 } else { 0 }  << 0)
+            }
+        }
+    }
+
+    /// Create new status byte with given settings.
+    ///
+    /// Provided channel value is optional. If no channel is given,
+    /// this status byte will select a read-back command.
+    pub fn new(ch: Option<Channel>, access: AccessMode,
+            op: OperatingMode) -> Self {
+        Self::new_with_bcd(ch, access, op, false)
+    }
+
     /// Read status byte from given channel.
     pub fn read_from(chan: Channel) -> Self {
         unimplemented!()
