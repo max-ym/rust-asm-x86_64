@@ -553,6 +553,9 @@ impl LocalApic {
             icr1_pending : icr1_val,
         }
     }
+
+    lapic_reg_ref_impl!(LogicalDestination, ldr, ldr_mut,
+            Ldr, "Logical destination register.");
 }
 
 impl Version {
