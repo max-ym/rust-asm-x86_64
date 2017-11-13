@@ -714,6 +714,17 @@ impl Icr0 {
     }
 }
 
+impl Icr1 {
+
+    pub fn destination(&self) -> u8 {
+        (self.reg >> 24) as _
+    }
+
+    pub fn set_destination(&mut self, dest: u8) {
+        self.reg = self.reg & (0xFF << 24) | ((dest as u32) << 24);
+    }
+}
+
 impl LvtTimer {
     lvt_entry_impl_base!();
 
