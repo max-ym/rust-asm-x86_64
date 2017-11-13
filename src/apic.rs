@@ -84,6 +84,32 @@ pub enum DeliveryStatus {
     SendPending,
 }
 
+/// ICR level field.
+#[derive(Clone, Copy)]
+pub enum IcrLevel {
+    Assert,
+    Deassert,
+}
+
+/// IPI destination mode.
+#[derive(Clone, Copy)]
+pub enum DestinationMode {
+    Physical,
+    Logical,
+}
+
+/// Destination shorthand of ICR.
+#[repr(u32)]
+#[derive(Clone, Copy)]
+pub enum DestinationShorthand {
+
+    /// Destination is set in destination field.
+    NoShorthand         = 0b00,
+    SelfDestination     = 0b01,
+    AllIncludingSelf    = 0b10,
+    AllExcludingSelf    = 0b11,
+}
+
 /// Delivery mode of LVT interrupt.
 #[repr(u32)]
 #[derive(Clone, Copy)]
@@ -140,6 +166,20 @@ pub struct SpuriousInterrupt {
 #[derive(Clone, Copy)]
 pub struct LvtCmci {
     reg     : u32,
+}
+
+/// Interrupt command register 0.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct Icr0 {
+    reg     : u32
+}
+
+/// Interrupt command register 1.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct Icr1 {
+    reg     : u32
 }
 
 /// Value of Local Vector Table Timer register of APIC.
@@ -264,6 +304,13 @@ impl VersionNumber {
         } else {
             VersionNumber::Integrated(num)
         }
+    }
+}
+
+impl From<u32> for DestinationShorthand {
+
+    fn from(v: u32) -> DestinationShorthand {
+        unsafe { ::core::mem::transmute(v) }
     }
 }
 
@@ -559,6 +606,68 @@ impl SpuriousInterrupt {
 impl LvtCmci {
     lvt_entry_impl_base!();
     lvt_entry_impl_delivery!();
+}
+
+impl Icr0 {
+
+    /// Interrupt vector.
+    pub fn vector(&self) -> u8 {
+        (self.reg & 0xF) as u8
+    }
+
+    /// Interrupt delivery mode.
+    pub fn delivery_mode(&self) -> DeliveryMode {
+        let val = (self.reg >> 8) & 0b111;
+        DeliveryMode::from(val)
+    }
+
+    /// IPI destination mode.
+    pub fn destination_mode(&self) -> DestinationMode {
+        use self::DestinationMode::*;
+
+        if self.reg & (1 << 11) != 0 {
+            Logical
+        } else {
+            Physical
+        }
+    }
+
+    /// Delivery status.
+    pub fn delivery_status(&self) -> DeliveryStatus {
+        use self::DeliveryStatus::*;
+
+        if self.reg & (1 << 11) != 0 {
+            SendPending
+        } else {
+            Idle
+        }
+    }
+
+    pub fn level(&self) -> IcrLevel {
+        use self::IcrLevel::*;
+
+        if self.reg & (1 << 14) != 0 {
+            Assert
+        } else {
+            Deassert
+        }
+    }
+
+    pub fn trigger_mode(&self) -> TriggerMode {
+        use self::TriggerMode::*;
+
+        if self.reg & (1 << 15) != 0 {
+            LevelSensitive
+        } else {
+            EdgeSensitive
+        }
+    }
+
+    pub fn destination_shorthand(&self) -> DestinationShorthand {
+        use self::DestinationShorthand::*;
+
+        DestinationShorthand::from((self.reg >> 18) & 0b11)
+    }
 }
 
 impl LvtTimer {
