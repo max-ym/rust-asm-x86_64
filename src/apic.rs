@@ -78,6 +78,13 @@ pub enum VersionNumber {
     Integrated  (u8),
 }
 
+/// MDA model used in Dfr.
+#[repr(u8)]
+pub enum MdaModel {
+    Flat        = 0b1111,
+    Cluster     = 0b0000,
+}
+
 /// Delivery status of LVT interrupts.
 pub enum DeliveryStatus {
     Idle,
@@ -159,6 +166,15 @@ pub struct Eoi {
 #[derive(Clone, Copy)]
 pub struct Ldr {
     reg     : u32,
+}
+
+/// Destination format register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct Dfr {
+    model   : u8,
+    _resv0  : u8,
+    _resv1  : u16,
 }
 
 /// Spurious Interrupt register.
@@ -321,6 +337,13 @@ impl VersionNumber {
         } else {
             VersionNumber::Integrated(num)
         }
+    }
+}
+
+impl From<u8> for MdaModel {
+
+    fn from(val: u8) -> MdaModel {
+        unsafe { ::core::mem::transmute(val) }
     }
 }
 
@@ -556,6 +579,9 @@ impl LocalApic {
 
     lapic_reg_ref_impl!(LogicalDestination, ldr, ldr_mut,
             Ldr, "Logical destination register.");
+
+    lapic_reg_ref_impl!(DestinationFormat, dfr, dfr_mut,
+            Dfr, "Destination format register.");
 }
 
 impl Version {
@@ -592,6 +618,17 @@ impl Ldr {
 
     pub fn set_logical_apic_id(&mut self, val: u8) {
         self.reg = self.reg & 0x00FF_FFFF | ((val as u32) << 24);
+    }
+}
+
+impl Dfr {
+
+    pub fn model(&self) -> MdaModel {
+        MdaModel::from(self.model)
+    }
+
+    pub fn set_model(&mut self, model: MdaModel) {
+        self.model = model as _;
     }
 }
 
