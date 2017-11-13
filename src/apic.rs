@@ -584,6 +584,17 @@ impl LvtLint0 {
     lvt_entry_impl_base!();
     lvt_entry_impl_delivery!();
     lvt_entry_impl_lint!();
+
+    /// Set trigger mode. Note that some delivery modes ignore this value
+    /// and use their default trigger mode.
+    pub fn set_trigger_mode(&mut self, mode: TriggerMode) {
+        use self::TriggerMode::*;
+
+        match mode {
+            EdgeSensitive   => self.reg &= !(1 << 15),
+            LevelSensitive  => self.reg |=   1 << 15
+        }
+    }
 }
 
 impl LvtLint1 {
