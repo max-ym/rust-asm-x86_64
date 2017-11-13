@@ -615,10 +615,21 @@ impl Icr0 {
         (self.reg & 0xF) as u8
     }
 
+    /// Set new interrupt vector.
+    pub fn set_vector(&mut self, vec: u8) {
+        self.reg = self.reg & !0xF | (vec as u32);
+    }
+
     /// Interrupt delivery mode.
     pub fn delivery_mode(&self) -> DeliveryMode {
         let val = (self.reg >> 8) & 0b111;
         DeliveryMode::from(val)
+    }
+
+    /// Set delivery mode.
+    pub fn set_delivery_mode(&mut self, mode: DeliveryMode) {
+        let val = mode as u32;
+        self.reg = self.reg & !(0b111 << 8) | (val << 8);
     }
 
     /// IPI destination mode.
@@ -629,6 +640,16 @@ impl Icr0 {
             Logical
         } else {
             Physical
+        }
+    }
+
+    /// Set IPI destination mode.
+    pub fn set_destination_mode(&mut self, mode: DestinationMode) {
+        use self::DestinationMode::*;
+
+        match mode {
+            Logical     => self.reg |=   1 << 11,
+            Physical    => self.reg &= !(1 << 11)
         }
     }
 
@@ -653,6 +674,15 @@ impl Icr0 {
         }
     }
 
+    pub fn set_level(&mut self, level: IcrLevel) {
+        use self::IcrLevel::*;
+
+        match level {
+            Assert      => self.reg |=   1 << 14,
+            Deassert    => self.reg &= !(1 << 14)
+        }
+    }
+
     pub fn trigger_mode(&self) -> TriggerMode {
         use self::TriggerMode::*;
 
@@ -663,10 +693,24 @@ impl Icr0 {
         }
     }
 
+    pub fn set_trigger_mode(&mut self, mode: TriggerMode) {
+        use self::TriggerMode::*;
+
+        match mode {
+            EdgeSensitive   => self.reg &= !(1 << 15),
+            LevelSensitive  => self.reg |=   1 << 15
+        }
+    }
+
     pub fn destination_shorthand(&self) -> DestinationShorthand {
         use self::DestinationShorthand::*;
 
         DestinationShorthand::from((self.reg >> 18) & 0b11)
+    }
+
+    pub fn set_destination_shorthand(&mut self, ds: DestinationShorthand) {
+        let val = (ds as u32) << 18;
+        self.reg = self.reg & (0b11 << 18) | val;
     }
 }
 
