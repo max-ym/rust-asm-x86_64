@@ -526,6 +526,26 @@ impl LocalApic {
 
     lapic_reg_ref_impl!(divide_configuration, divide_configuration_mut,
             DivideConfiguration, "Divide configuration value.");
+
+    /// ICR registers interface.
+    pub fn icr_interface(&mut self) -> Icr {
+        let icr0_ptr = LocalApicReg::InterruptCommand0.ptr32_mut(self);
+        let icr1_ptr = LocalApicReg::InterruptCommand1.ptr32_mut(self);
+
+        let icr0 = unsafe { &mut *(icr0_ptr as *mut Icr0) };
+        let icr1 = unsafe { &mut *(icr1_ptr as *mut Icr1) };
+
+        let icr0_val = icr0.clone();
+        let icr1_val = icr1.clone();
+
+        Icr {
+            icr0 : icr0,
+            icr1 : icr1,
+
+            icr0_pending : icr0_val,
+            icr1_pending : icr1_val,
+        }
+    }
 }
 
 impl Version {
