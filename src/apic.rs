@@ -182,6 +182,16 @@ pub struct Icr1 {
     reg     : u32
 }
 
+/// Interrupt command register interface. Takes care of writing values
+/// into the APIC registers in right order and time.
+pub struct Icr<'a> {
+    icr0: &'a mut Icr0,
+    icr1: &'a mut Icr1,
+
+    icr0_pending: Icr0,
+    icr1_pending: Icr1,
+}
+
 /// Value of Local Vector Table Timer register of APIC.
 #[repr(packed)]
 #[derive(Clone, Copy)]
@@ -722,6 +732,91 @@ impl Icr1 {
 
     pub fn set_destination(&mut self, dest: u8) {
         self.reg = self.reg & (0xFF << 24) | ((dest as u32) << 24);
+    }
+}
+
+impl<'a> Icr<'a> {
+
+    pub fn vector(&self) -> u8 {
+        self.icr0_pending.vector()
+    }
+
+    pub fn set_vector(&mut self, vec: u8) {
+        self.icr0_pending.set_vector(vec)
+    }
+
+    pub fn delivery_mode(&self) -> DeliveryMode {
+        self.icr0_pending.delivery_mode()
+    }
+
+    pub fn set_delivery_mode(&mut self, mode: DeliveryMode) {
+        self.icr0_pending.set_delivery_mode(mode)
+    }
+
+    pub fn destination_mode(&self) -> DestinationMode {
+        self.icr0_pending.destination_mode()
+    }
+
+    pub fn set_destination_mode(&mut self, mode: DestinationMode) {
+        self.icr0_pending.set_destination_mode(mode)
+    }
+
+    pub fn delivery_status(&self) -> DeliveryStatus {
+        // Current value, not pending one.
+        self.icr0.delivery_status()
+    }
+
+    pub fn level(&self) -> IcrLevel {
+        self.icr0_pending.level()
+    }
+
+    pub fn set_level(&mut self, level: IcrLevel) {
+        self.icr0_pending.set_level(level)
+    }
+
+    pub fn trigger_mode(&self) -> TriggerMode {
+        self.icr0_pending.trigger_mode()
+    }
+    pub fn set_trigger_mode(&mut self, mode: TriggerMode) {
+        self.icr0_pending.set_trigger_mode(mode)
+    }
+
+    pub fn destination_shorthand(&self) -> DestinationMode {
+        self.icr0_pending.destination_mode()
+    }
+
+    pub fn set_destination_shorthand(&mut self, ds: DestinationShorthand) {
+        self.icr0_pending.set_destination_shorthand(ds)
+    }
+
+    pub fn destination(&self) -> u8 {
+        self.icr1_pending.destination()
+    }
+
+    pub fn set_destination(&mut self, dest: u8) {
+        self.icr1_pending.set_destination(dest)
+    }
+
+    /// Restore ICR0 value from registers.
+    pub fn restore_icr0(&mut self) {
+        self.icr0_pending = self.icr0.clone();
+    }
+
+    /// Restore ICR1 value from registers.
+    pub fn restore_icr1(&mut self) {
+        self.icr1_pending = self.icr1.clone();
+    }
+
+    /// Save pending values to real registers.
+    pub fn apply(&mut self) {
+        // Values must be stored in given order:
+        *self.icr1 = self.icr1_pending;
+        *self.icr0 = self.icr0_pending;
+    }
+
+    /// Save changes only from icr0.
+    pub fn apply_icr0(&mut self) {
+        *self.icr0 = self.icr0_pending;
     }
 }
 
