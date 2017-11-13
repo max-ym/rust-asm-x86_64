@@ -154,6 +154,13 @@ pub struct Eoi {
     reg     : u32,
 }
 
+/// Logical destination register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct Ldr {
+    reg     : u32,
+}
+
 /// Spurious Interrupt register.
 #[repr(packed)]
 #[derive(Clone, Copy)]
@@ -571,6 +578,17 @@ impl Eoi {
     /// Send End-Of-Interrupt signal.
     pub fn signal(&mut self) {
         self.reg = 0;
+    }
+}
+
+impl Ldr {
+
+    pub fn logical_apic_id(&self) -> u8 {
+        (self.reg >> 24) as _
+    }
+
+    pub fn set_logical_apic_id(&mut self, val: u8) {
+        self.reg = self.reg & 0x00FF_FFFF | ((val as u32) << 24);
     }
 }
 
