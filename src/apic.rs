@@ -360,6 +360,16 @@ macro_rules! lvt_entry_impl_lint {
                 ActiveHigh
             }
         }
+
+        /// Set interrupt input pin polarity.
+        pub fn set_input_polarity(&mut self, pp: PinPolarity) {
+            use self::PinPolarity::*;
+
+            match pp {
+                ActiveHigh  => self.reg &= !(1 << 13),
+                ActiveLow   => self.reg |=   1 << 13
+            }
+        }
     }
 }
 
