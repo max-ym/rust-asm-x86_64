@@ -186,9 +186,10 @@ pub struct Ldr {
 #[repr(packed)]
 #[derive(Clone, Copy)]
 pub struct Dfr {
+    _resv0  : u16,
+    _resv1  : u8,
+
     model   : u8,
-    _resv0  : u8,
-    _resv1  : u16,
 }
 
 /// Spurious Interrupt register.
