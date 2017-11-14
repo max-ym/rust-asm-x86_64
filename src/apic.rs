@@ -170,6 +170,15 @@ pub struct Apr {
     _resv1  : u16,
 }
 
+/// Processor priority register.
+#[repr(packed)]
+pub struct Ppr {
+    class   : u8,
+
+    _resv0  : u8,
+    _resv1  : u16,
+}
+
 /// Value of DivideConfiguration register of APIC.
 #[repr(packed)]
 #[derive(Clone, Copy)]
@@ -659,74 +668,57 @@ impl Version {
     }
 }
 
+macro_rules! impl_pr_ro {
+    () => {
+        /// Class field.
+        pub fn class_field(&self) -> u8 {
+            self.class
+        }
+
+        /// Arbitration priority sub-class.
+        pub fn subclass(&self) -> PriorityClass {
+            PriorityClass::try_new(self.class & 0x0F).unwrap()
+        }
+
+        /// Arbitration priority class.
+        pub fn class(&self) -> PriorityClass {
+            let val = self.class >> 4;
+            PriorityClass::try_new(val).unwrap()
+        }
+    };
+}
+
+macro_rules! impl_pr_wo {
+    () => {
+        /// Set class field.
+        pub fn set_class_field(&mut self, class: u8) {
+            self.class = class;
+        }
+
+        pub fn set_subclass(&mut self, class: PriorityClass) {
+            let mask: u8 = class.into();
+            self.class = self.class & 0xF0 | mask;
+        }
+
+        pub fn set_class(&mut self, class: PriorityClass) {
+            let mask: u8 = class.into();
+            let mask = mask << 4;
+            self.class = self.class & 0x0F | mask;
+        }
+    };
+}
+
 impl Tpr {
-
-    /// Class field.
-    pub fn class_field(&self) -> u8 {
-        self.class
-    }
-
-    /// Set class field.
-    pub fn set_class_field(&mut self, class: u8) {
-        self.class = class;
-    }
-
-    /// Arbitration priority sub-class.
-    pub fn subclass(&self) -> PriorityClass {
-        PriorityClass::try_new(self.class & 0x0F).unwrap()
-    }
-
-    pub fn set_subclass(&mut self, class: PriorityClass) {
-        let mask: u8 = class.into();
-        self.class = self.class & 0xF0 | mask;
-    }
-
-    /// Arbitration priority class.
-    pub fn class(&self) -> PriorityClass {
-        let val = self.class >> 4;
-        PriorityClass::try_new(val).unwrap()
-    }
-
-    pub fn set_class(&mut self, class: PriorityClass) {
-        let mask: u8 = class.into();
-        let mask = mask << 4;
-        self.class = self.class & 0x0F | mask;
-    }
+    impl_pr_ro!();
+    impl_pr_wo!();
 }
 
 impl Apr {
+    impl_pr_ro!();
+}
 
-    /// Class field.
-    pub fn class_field(&self) -> u8 {
-        self.class
-    }
-
-    /// Set class field.
-    pub fn set_class_field(&mut self, class: u8) {
-        self.class = class;
-    }
-
-    /// Arbitration priority sub-class.
-    pub fn subclass(&self) -> PriorityClass {
-        PriorityClass::try_new(self.class & 0x0F).unwrap()
-    }
-
-    pub fn set_subclass(&mut self, class: PriorityClass) {
-        let mask: u8 = class.into();
-        self.class = self.class & 0xF0 | mask;
-    }
-
-    /// Arbitration priority class.
-    pub fn class(&self) -> PriorityClass {
-        let val = self.class >> 4;
-        PriorityClass::try_new(val).unwrap()
-    }
-
-    pub fn set_class(&mut self, class: PriorityClass) {
-        let mask: u8 = class.into();
-        let mask = mask << 4;
-        self.class = self.class & 0x0F | mask;
-    }
+impl Ppr {
+    impl_pr_ro!();
 }
 
 impl Eoi {
