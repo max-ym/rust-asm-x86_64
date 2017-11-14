@@ -499,14 +499,33 @@ macro_rules! lapic_reg_ref_impl {
     };
 
     ($enu:ident, $n:ident, $nm:ident, $ty:tt, $doc:expr) => {
+        lapic_reg_ref_impl_ro!($enu, $n , $ty, $doc);
+        lapic_reg_ref_impl_wo!($enu, $nm, $ty, $doc);
+    };
+}
+
+macro_rules! lapic_reg_ref_impl_ro {
+    ($n:ident, $ty:tt, $doc:expr) => {
+        lapic_reg_ref_impl_ro!($ty, $n, $ty, $doc);
+    };
+
+    ($enu:ident, $n:ident, $ty:tt, $doc:expr) => {
         #[doc=$doc]
         pub fn $n(&self) -> &$ty {
             let ptr = LocalApicReg::$enu.ptr32(self);
             unsafe { &*(ptr as *const _) }
         }
+    };
+}
 
+macro_rules! lapic_reg_ref_impl_wo {
+    ($n:ident, $ty:tt, $doc:expr) => {
+        lapic_reg_ref_impl_ro!($ty, $n, $ty, $doc);
+    };
+
+    ($enu:ident, $n:ident, $ty:tt, $doc:expr) => {
         #[doc=$doc]
-        pub fn $nm(&mut self) -> &mut $ty {
+        pub fn $n(&mut self) -> &mut $ty {
             let ptr = LocalApicReg::$enu.ptr32_mut(self);
             unsafe { &mut *(ptr as *mut _) }
         }
