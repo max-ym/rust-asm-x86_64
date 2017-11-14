@@ -928,8 +928,6 @@ impl Icr0 {
     }
 
     pub fn destination_shorthand(&self) -> DestinationShorthand {
-        use self::DestinationShorthand::*;
-
         DestinationShorthand::from((self.reg >> 18) & 0b11)
     }
 
