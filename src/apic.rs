@@ -636,6 +636,9 @@ impl LocalApic {
 
     lapic_reg_ref_impl!(TaskPriority, tpr, tpr_mut,
             Tpr, "Task priority register.");
+
+    lapic_reg_ref_impl_ro!(ProcessorPriority, ppr,
+            Ppr, "Processor priority register.");
 }
 
 impl PriorityClass {
