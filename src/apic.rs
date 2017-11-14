@@ -631,7 +631,7 @@ impl LocalApic {
     lapic_reg_ref_impl!(DestinationFormat, dfr, dfr_mut,
             Dfr, "Destination format register.");
 
-    lapic_reg_ref_impl!(ArbitrationPriority, apr, apr_mut,
+    lapic_reg_ref_impl_ro!(ArbitrationPriority, apr,
             Apr, "Arbitration priority register.");
 
     lapic_reg_ref_impl!(TaskPriority, tpr, tpr_mut,
