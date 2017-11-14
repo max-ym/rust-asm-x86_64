@@ -579,11 +579,7 @@ impl LocalApic {
         unsafe { &*(ptr as *const _) }
     }
 
-    /// EOI register.
-    pub fn eoi_mut(&mut self) -> &mut Eoi {
-        let ptr = LocalApicReg::Eoi.ptr32_mut(self);
-        unsafe { &mut *(ptr as *mut _) }
-    }
+    lapic_reg_ref_impl_wo!(eoi_mut, Eoi, "EOI register.");
 
     lapic_reg_ref_impl!(SpuriousInterruptVector,
             spurious_interrupt, spurious_interrupt_mut,
