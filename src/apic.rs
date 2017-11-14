@@ -140,11 +140,25 @@ pub enum TriggerMode {
     LevelSensitive,
 }
 
+/// Arbitration priority class or sub-class value.
+pub struct ArbitrationPriorityClass {
+    val : u8,
+}
+
 /// Version register.
 #[repr(packed)]
 #[derive(Clone, Copy)]
 pub struct Version {
     reg     : u32,
+}
+
+/// Arbitration priority register.
+#[repr(packed)]
+pub struct Apr {
+    class   : u8,
+
+    _resv0  : u8,
+    _resv1  : u16,
 }
 
 /// Value of DivideConfiguration register of APIC.
@@ -584,6 +598,33 @@ impl LocalApic {
             Dfr, "Destination format register.");
 }
 
+impl ArbitrationPriorityClass {
+
+    /// Try converting given class value to instance of this class.
+    /// This can be possible only for number between 0 and 15 inclusive as
+    /// only these values represent class or sub-class field (which is 4 bits
+    /// in size - 16 different values can be stored).
+    pub fn try_new(val: u8) -> Option<Self> {
+        if val > 0x0F {
+            None
+        } else {
+            Some(ArbitrationPriorityClass { val : val })
+        }
+    }
+
+    /// Value of priority class.
+    pub fn value(&self) -> u8 {
+        self.val
+    }
+}
+
+impl Into<u8> for ArbitrationPriorityClass {
+
+    fn into(self) -> u8 {
+        self.value()
+    }
+}
+
 impl Version {
 
     /// Local APIC version number.
@@ -599,6 +640,41 @@ impl Version {
     /// Check support of EOI broadcast suppression.
     pub fn eoi_broadcast_suppression(&self) -> bool {
         self.reg & 0x10_00 != 0
+    }
+}
+
+impl Apr {
+
+    /// Class field.
+    pub fn class_field(&self) -> u8 {
+        self.class
+    }
+
+    /// Set class field.
+    pub fn set_class_field(&mut self, class: u8) {
+        self.class = class;
+    }
+
+    /// Arbitration priority sub-class.
+    pub fn subclass(&self) -> ArbitrationPriorityClass {
+        ArbitrationPriorityClass::try_new(self.class & 0x0F).unwrap()
+    }
+
+    pub fn set_subclass(&mut self, class: ArbitrationPriorityClass) {
+        let mask: u8 = class.into();
+        self.class = self.class & 0xF0 | mask;
+    }
+
+    /// Arbitration priority class.
+    pub fn class(&self) -> ArbitrationPriorityClass {
+        let val = self.class >> 4;
+        ArbitrationPriorityClass::try_new(val).unwrap()
+    }
+
+    pub fn set_class(&mut self, class: ArbitrationPriorityClass) {
+        let mask: u8 = class.into();
+        let mask = mask << 4;
+        self.class = self.class & 0x0F | mask;
     }
 }
 
