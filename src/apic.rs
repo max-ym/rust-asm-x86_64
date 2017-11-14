@@ -152,6 +152,15 @@ pub struct Version {
     reg     : u32,
 }
 
+/// Task priority register.
+#[repr(packed)]
+pub struct Tpr {
+    class   : u8,
+
+    _resv0  : u8,
+    _resv1  : u16,
+}
+
 /// Arbitration priority register.
 #[repr(packed)]
 pub struct Apr {
@@ -600,6 +609,9 @@ impl LocalApic {
 
     lapic_reg_ref_impl!(ArbitrationPriority, apr, apr_mut,
             Apr, "Arbitration priority register.");
+
+    lapic_reg_ref_impl!(TaskPriority, tpr, tpr_mut,
+            Tpr, "Task priority register.");
 }
 
 impl PriorityClass {
@@ -644,6 +656,41 @@ impl Version {
     /// Check support of EOI broadcast suppression.
     pub fn eoi_broadcast_suppression(&self) -> bool {
         self.reg & 0x10_00 != 0
+    }
+}
+
+impl Tpr {
+
+    /// Class field.
+    pub fn class_field(&self) -> u8 {
+        self.class
+    }
+
+    /// Set class field.
+    pub fn set_class_field(&mut self, class: u8) {
+        self.class = class;
+    }
+
+    /// Arbitration priority sub-class.
+    pub fn subclass(&self) -> PriorityClass {
+        PriorityClass::try_new(self.class & 0x0F).unwrap()
+    }
+
+    pub fn set_subclass(&mut self, class: PriorityClass) {
+        let mask: u8 = class.into();
+        self.class = self.class & 0xF0 | mask;
+    }
+
+    /// Arbitration priority class.
+    pub fn class(&self) -> PriorityClass {
+        let val = self.class >> 4;
+        PriorityClass::try_new(val).unwrap()
+    }
+
+    pub fn set_class(&mut self, class: PriorityClass) {
+        let mask: u8 = class.into();
+        let mask = mask << 4;
+        self.class = self.class & 0x0F | mask;
     }
 }
 
