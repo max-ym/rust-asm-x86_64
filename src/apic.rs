@@ -596,6 +596,9 @@ impl LocalApic {
 
     lapic_reg_ref_impl!(DestinationFormat, dfr, dfr_mut,
             Dfr, "Destination format register.");
+
+    lapic_reg_ref_impl!(ArbitrationPriority, apr, apr_mut,
+            Apr, "Arbitration priority register.");
 }
 
 impl ArbitrationPriorityClass {
