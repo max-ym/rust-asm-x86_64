@@ -141,7 +141,7 @@ pub enum TriggerMode {
 }
 
 /// Arbitration priority class or sub-class value.
-pub struct ArbitrationPriorityClass {
+pub struct PriorityClass {
     val : u8,
 }
 
@@ -602,7 +602,7 @@ impl LocalApic {
             Apr, "Arbitration priority register.");
 }
 
-impl ArbitrationPriorityClass {
+impl PriorityClass {
 
     /// Try converting given class value to instance of this class.
     /// This can be possible only for number between 0 and 15 inclusive as
@@ -612,7 +612,7 @@ impl ArbitrationPriorityClass {
         if val > 0x0F {
             None
         } else {
-            Some(ArbitrationPriorityClass { val : val })
+            Some(PriorityClass { val : val })
         }
     }
 
@@ -622,7 +622,7 @@ impl ArbitrationPriorityClass {
     }
 }
 
-impl Into<u8> for ArbitrationPriorityClass {
+impl Into<u8> for PriorityClass {
 
     fn into(self) -> u8 {
         self.value()
@@ -660,22 +660,22 @@ impl Apr {
     }
 
     /// Arbitration priority sub-class.
-    pub fn subclass(&self) -> ArbitrationPriorityClass {
-        ArbitrationPriorityClass::try_new(self.class & 0x0F).unwrap()
+    pub fn subclass(&self) -> PriorityClass {
+        PriorityClass::try_new(self.class & 0x0F).unwrap()
     }
 
-    pub fn set_subclass(&mut self, class: ArbitrationPriorityClass) {
+    pub fn set_subclass(&mut self, class: PriorityClass) {
         let mask: u8 = class.into();
         self.class = self.class & 0xF0 | mask;
     }
 
     /// Arbitration priority class.
-    pub fn class(&self) -> ArbitrationPriorityClass {
+    pub fn class(&self) -> PriorityClass {
         let val = self.class >> 4;
-        ArbitrationPriorityClass::try_new(val).unwrap()
+        PriorityClass::try_new(val).unwrap()
     }
 
-    pub fn set_class(&mut self, class: ArbitrationPriorityClass) {
+    pub fn set_class(&mut self, class: PriorityClass) {
         let mask: u8 = class.into();
         let mask = mask << 4;
         self.class = self.class & 0x0F | mask;
