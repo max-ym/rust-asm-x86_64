@@ -4,6 +4,11 @@ pub struct Pic {
 
 impl Pic {
 
+    /// Create new interface to PIC.
+    pub fn new() -> Self {
+        Pic {}
+    }
+
     /// Disable PIC.
     pub fn disable(&self) {
         use port::Port;
