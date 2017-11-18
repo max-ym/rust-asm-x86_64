@@ -28,6 +28,9 @@ pub mod msr;
 /// Functions to send data through the processor ports.
 pub mod port;
 
+/// Programable Interrupt Controller module.
+pub mod pic;
+
 /// Segment registers.
 pub mod seg;
 
