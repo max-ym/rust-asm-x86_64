@@ -18,11 +18,21 @@ pub enum InfoType {
     Tlb             = 0x02,
     Serial          = 0x03,
 
+    // Xsave           = 0x0D, // Sub-function needs to be specified too.
+
     IntelExtended       = 0x8000_0000,
     IntelFeatures       = 0x8000_0001,
     IntelBrandString    = 0x8000_0002,
     IntelBrandStringMore= 0x8000_0003,
     IntelBrandStringEnd = 0x8000_0004,
+}
+
+/// XSAVE information types. Is passed to CPUID in ECX register.
+#[repr(u32)]
+#[derive(Clone, Copy)]
+pub enum XsaveInfoType {
+    Subf0       = 0x00,
+    Subf1       = 0x01,
 }
 
 impl Info {
@@ -31,6 +41,12 @@ impl Info {
     #[inline(always)]
     pub fn get(info: InfoType) -> Self {
         Self::get_by_code(info as u32)
+    }
+
+    #[inline(always)]
+    pub fn get_xsave(info: XsaveInfoType) -> Self {
+        let xsave_cpuid_number = 0x0D;
+        Self::get_by_code_ecx(xsave_cpuid_number, info as _)
     }
 
     #[inline(always)]
@@ -45,9 +61,22 @@ impl Info {
 
         Info { eax:a, ebx:b, ecx:c, edx:d }
     }
+
+    #[inline(always)]
+    pub fn get_by_code_ecx(request: u32, subfunction: u32) -> Self {
+        let (a, b, c, d);
+
+        unsafe { asm!(
+            "cpuid"
+            : "={eax}"(a), "={ebx}"(b), "={ecx}"(c), "={edx}"(d)
+            : "{eax}"(request), "{ecx}"(subfunction)
+        ); }
+
+        Info { eax:a, ebx:b, ecx:c, edx:d }
+    }
 }
 
-macro_rules! derive_info {
+macro_rules! derive_conversions {
     ($x:ident) => (
         #[derive(Clone, Copy)]
         pub struct $x {
@@ -67,6 +96,12 @@ macro_rules! derive_info {
                 self.info
             }
         }
+    );
+}
+
+macro_rules! derive_info {
+    ($x:ident) => (
+        derive_conversions!($x);
 
         impl $x {
 
@@ -87,6 +122,25 @@ derive_info!(IntelFeatures);
 derive_info!(IntelBrandString);
 derive_info!(IntelBrandStringMore);
 derive_info!(IntelBrandStringEnd);
+
+derive_conversions!(Xsave0);
+derive_conversions!(Xsave1);
+
+impl Xsave0 {
+
+    /// Call CPUID and get this structure.
+    pub fn get() -> Self {
+        Info::get_xsave(XsaveInfoType::Subf0).into()
+    }
+}
+
+impl Xsave1 {
+
+    /// Call CPUID and get this structure.
+    pub fn get() -> Self {
+        Info::get_xsave(XsaveInfoType::Subf1).into()
+    }
+}
 
 impl VendorString {
 
@@ -173,5 +227,10 @@ impl Features {
     /// Whether APIC supports one-shot operation using TSC deadline value.
     pub fn tsc_deadline_supported(&self) -> bool {
         self.info.ecx & (1 << 24) != 0
+    }
+
+    /// Whether XSAVE instruction family is supported.
+    pub fn xsave_supported(&self) -> bool {
+        self.info.ecx & (1 << 26) != 0
     }
 }
