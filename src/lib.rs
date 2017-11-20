@@ -49,3 +49,6 @@ pub mod cr;
 
 /// Programmable Interval Timer.
 pub mod pit;
+
+/// XSAVE instruction module.
+pub mod xsave;
