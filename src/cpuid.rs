@@ -132,13 +132,57 @@ impl Xsave0 {
     pub fn get() -> Self {
         Info::get_xsave(XsaveInfoType::Subf0).into()
     }
+
+    /// Size of XSAVE region when all supported state components are
+    /// stored.
+    pub fn size_of_all(&self) -> u32 {
+        self.info.ecx
+    }
+
+    /// Size of XSAVE region when all currently enabled state components are
+    /// stored.
+    pub fn size_of_current(&self) -> u32 {
+        self.info.ebx
+    }
 }
 
 impl Xsave1 {
 
+    const XSAVEOPT      : u32 = (1 << 0);
+    const COMPACT_FORM  : u32 = (1 << 1);
+    const XGETBV        : u32 = (1 << 2);
+    const XSAVES        : u32 = (1 << 3);
+
     /// Call CPUID and get this structure.
     pub fn get() -> Self {
         Info::get_xsave(XsaveInfoType::Subf1).into()
+    }
+
+    /// Whether XSAVEOPT instruction is supported.
+    pub fn xsaveopt_supported(&self) -> bool {
+        self.info.eax & Self::XSAVEOPT != 0
+    }
+
+    /// Whether compact form is supported. If so, XSAVEC and compact form of
+    /// is supported XRSTOR.
+    pub fn compact_form_supported(&self) -> bool {
+        self.info.eax & Self::COMPACT_FORM != 0
+    }
+
+    /// Whether XGETBV instruction is supported.
+    pub fn xgetbv_supported(&self) -> bool {
+        self.info.eax & Self::XGETBV != 0
+    }
+
+    /// Whether XSAVES, XRSTORS, IA32_XSS MSR is supported.
+    pub fn xsaves_supported(&self) -> bool {
+        self.info.eax & Self::XSAVES != 0
+    }
+
+    /// Size of XSAVE area containing all the state components corresponding
+    /// to bits currently set in XCR0 | IA32_XSS.
+    pub fn xsaves_size_of_current(&self) -> u32 {
+        self.info.ebx
     }
 }
 
