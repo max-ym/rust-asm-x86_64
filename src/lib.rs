@@ -10,7 +10,7 @@ extern crate new_bitflags;
 
 /// This module simulates 'std' library for extern crates.
 mod std {
-    pub use core::*;
+pub use core::*;
 }
 
 /// Module related to I/O APIC and Local APIC.
@@ -30,6 +30,9 @@ pub mod port;
 
 /// Programable Interrupt Controller module.
 pub mod pic;
+
+/// Register files module.
+pub mod regf;
 
 /// Segment registers.
 pub mod seg;
