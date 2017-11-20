@@ -45,3 +45,29 @@ new!(fs, set_fs);
 
 /// Extra "G" segment register.
 new!(gs, set_gs);
+
+/// Task State Segment.
+#[repr(packed)]
+#[derive(Default, Clone, Copy)]
+pub struct Tss {
+    pub _resv0      : u32,
+
+    pub rsp0        : u64,
+    pub rsp1        : u64,
+    pub rsp2        : u64,
+
+    pub _resv1      : u64,
+
+    pub ist1        : u64,
+    pub ist2        : u64,
+    pub ist3        : u64,
+    pub ist4        : u64,
+    pub ist5        : u64,
+    pub ist6        : u64,
+    pub ist7        : u64,
+
+    pub _resv2      : u64,
+    pub _resv3      : u16,
+
+    pub iomap_offset: u16,
+}
