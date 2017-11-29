@@ -19,8 +19,8 @@ pub fn enable() {
     }
 }
 
-/// Xcr0 register interface.
-pub struct Xcr0 {
+/// XSAVE mask that is used in Xcr0 and MSR XSS.
+pub struct Mask {
     val     : u64,
 }
 
@@ -47,7 +47,7 @@ macro_rules! impl_xcr_flag {
     );
 }
 
-impl Xcr0 {
+impl Mask {
 
     const SSE           : u64 = 1 << 1;
     const AVX           : u64 = 1 << 2;
