@@ -1,3 +1,5 @@
+use xsave::Mask as XsaveMask;
+
 /// Trait means that structure represents a register in a processor.
 /// Changes are not immediately commited to the real register. This
 /// trait defines functions that allow to read and store the data
@@ -28,6 +30,12 @@ pub struct Cr3 {
 #[derive(Clone, Copy)]
 pub struct Cr4 {
     data    : u64,
+}
+
+/// Interface for XCR0 register.
+#[derive(Clone, Copy)]
+pub struct Xcr0 {
+    val     : u64
 }
 
 impl Reg for Cr3 {
@@ -176,4 +184,48 @@ impl Cr4 {
     impl_cr4_fn!(
             OSXSAVE             , osxsave               ,
             enable_osxsave      , disable_osxsave       );
+}
+
+impl Xcr0 {
+
+    /// Set given mask to be stored on next write operation.
+    ///
+    /// # Safety
+    /// This fn does not check mask whether it's valid. It may
+    /// cause system error when it contains invalid value.
+    pub unsafe fn set_mask(&mut self, mask: XsaveMask) {
+        self.val = mask.into();
+    }
+
+    /// Get mask currently set in the interface. This mask may not
+    /// be the same as in physical register if it was re-set by
+    /// software and new value still was not stored in real
+    /// register.
+    pub fn mask(&self) -> XsaveMask {
+        XsaveMask::from(self.val)
+    }
+}
+
+impl Reg for Xcr0 {
+
+    unsafe fn read() -> Self {
+        let val: u64;
+
+        asm!(
+            "xgetbv"
+        :   "={rax}" (val)
+        :   "{rcx}" (0)
+        :: "volatile"
+        );
+
+        Xcr0 { val }
+    }
+
+    unsafe fn save(&self) {
+        asm!(
+            "xsetbv"
+        ::  "{rax}" (self.val), "{rcx}" (0)
+        ::  "volatile"
+        );
+    }
 }

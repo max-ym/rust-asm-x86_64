@@ -1,3 +1,5 @@
+use xsave::Mask as XsaveMask;
+
 /// Info read from MSR.
 #[derive(Clone, Copy)]
 pub struct Info {
@@ -160,5 +162,31 @@ impl TscDeadline {
     /// Current MSR value.
     pub fn value(&self) -> u64 {
         self.eax as u64 + (self.edx as u64) << 32
+    }
+}
+
+impl Xss {
+
+    /// Set given mask to be stored on next write operation.
+    ///
+    /// # Safety
+    /// This fn does not check mask whether it's valid. It may
+    /// cause system error when it contains invalid value.
+    pub unsafe fn set_mask(&mut self, mask: XsaveMask) {
+        let val: u64 = mask.into();
+        self.eax = (val >> 00) as u32;
+        self.edx = (val >> 32) as u32;
+    }
+
+    /// Get mask currently set in the interface. This mask may not
+    /// be the same as in physical register if it was re-set by
+    /// software and new value still was not stored in real
+    /// register.
+    pub fn mask(&self) -> XsaveMask {
+        let eax = self.eax as u64;
+        let edx = self.edx as u64;
+        let val = eax | (edx << 32);
+
+        XsaveMask::from(val)
     }
 }

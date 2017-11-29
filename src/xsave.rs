@@ -1,3 +1,6 @@
+pub use msr::Xss as XssMsr;
+pub use cr::Xcr0;
+
 /// Check XSAVE support through CPUID instruction.
 pub fn is_supported() -> bool {
     fast_is_supported(::cpuid::Features::get())
@@ -77,4 +80,18 @@ impl Mask {
             "PKRU component save enable flag. This does not affect the
             availability of the instructions. Thus, PKRU instructions
             can be executed even with the flag unset.");
+}
+
+impl Into<u64> for Mask {
+
+    fn into(self) -> u64 {
+        self.val
+    }
+}
+
+impl From<u64> for Mask {
+
+    fn from(val: u64) -> Self {
+        Mask { val }
+    }
 }
