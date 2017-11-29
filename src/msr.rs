@@ -49,6 +49,7 @@ impl Info {
 pub enum Msr {
     ApicBase        = 0x01B,
     TscDeadline     = 0x6E0,
+    Xss             = 0xDA0,
 }
 
 macro_rules! derive_info {
@@ -94,6 +95,7 @@ macro_rules! derive_info {
 
 derive_info!(ApicBase);
 derive_info!(TscDeadline);
+derive_info!(Xss);
 
 impl ApicBase {
 
