@@ -145,6 +145,13 @@ pub struct PriorityClass {
     val : u8,
 }
 
+// Id register.
+#[repr(packed)]
+#[derive(Clone, Copy)]
+pub struct Id {
+    reg     : u32,
+}
+
 /// Version register.
 #[repr(packed)]
 #[derive(Clone, Copy)]
@@ -639,6 +646,9 @@ impl LocalApic {
 
     lapic_reg_ref_impl_ro!(ProcessorPriority, ppr,
             Ppr, "Processor priority register.");
+
+    lapic_reg_ref_impl!(Id, id, id_mut,
+            Id, "Local APIC ID.");
 }
 
 impl PriorityClass {
@@ -665,6 +675,23 @@ impl Into<u8> for PriorityClass {
 
     fn into(self) -> u8 {
         self.value()
+    }
+}
+
+impl Id {
+
+    /// Get initial local APIC ID. This value can be changed by OS on some
+    /// processors.
+    pub fn id(&self) -> u8 {
+        (self.reg >> 24) as _
+    }
+
+    /// Overwrite local APIC ID. This does not change CPUID value
+    /// in EBX (bits 31-24) for EAX=1 which always is initial
+    /// local APIC ID.
+    pub unsafe fn set_id(&mut self, id: u8) {
+        self.reg &= 0x00FF_FFFF;
+        self.reg |= (id as u32) << 24;
     }
 }
 
