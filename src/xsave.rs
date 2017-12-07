@@ -23,6 +23,7 @@ pub fn enable() {
 }
 
 /// XSAVE mask that is used in Xcr0 and MSR XSS.
+#[derive(Clone, Copy, Default)]
 pub struct Mask {
     val     : u64,
 }
