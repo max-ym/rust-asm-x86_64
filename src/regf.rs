@@ -67,7 +67,7 @@ pub struct Floating {
 pub struct State {
     pub rsp     : u64,
     pub rip     : u64,
-    pub flags   : u32,
+    pub flags   : u64,
 }
 
 /// Segment registers.
