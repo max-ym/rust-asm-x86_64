@@ -96,3 +96,41 @@ impl From<u64> for Mask {
         Mask { val }
     }
 }
+
+macro_rules! impl_xsave {
+    ($name:ident, $ins:expr) => {
+        pub unsafe fn $name(xarea: u64, mask: Mask) {
+            let eax = (mask.val      ) as u32;
+            let edx = (mask.val >> 32) as u32;
+            asm!(
+                concat!($ins, " [$0]")
+                :
+                : "r"(xarea), "{eax}"(eax), "{edx}"(edx)
+                :
+                : "intel"
+            );
+        }
+    };
+}
+
+/// Call XSAVE instruction and pass given xsave memory area and
+/// set given mask.
+///
+/// Note that XSAVE instruction support must be enabled, memory area
+/// needs to be 64-byte aligned.
+impl_xsave!(xsave, "xsave");
+
+/// Restore saved state with XRSTOR instruction.
+impl_xsave!(xrstor, "xrstor");
+
+/// Save the state with XSAVEOPT instruction.
+impl_xsave!(xsaveopt, "xsaveopt");
+
+/// Save the state using XSAVEC instruction.
+impl_xsave!(xsavec, "xsavec");
+
+/// Save the state using XSAVES instruction.
+impl_xsave!(xsaves, "xsaves");
+
+/// Restore the saved state with XRSTORS instruction.
+impl_xsave!(xrstors, "xrstors");
