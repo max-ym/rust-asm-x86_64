@@ -98,7 +98,8 @@ impl From<u64> for Mask {
 }
 
 macro_rules! impl_xsave {
-    ($name:ident, $ins:expr) => {
+    ($name:ident, $ins:expr, $doc:tt) => {
+        #[doc=$doc]
         pub unsafe fn $name(xarea: u64, mask: Mask) {
             let eax = (mask.val      ) as u32;
             let edx = (mask.val >> 32) as u32;
@@ -111,6 +112,10 @@ macro_rules! impl_xsave {
             );
         }
     };
+
+    ($name:ident, $ins:expr) => {
+        impl_xsave!($name, $ins, "");
+    };
 }
 
 /// Call XSAVE instruction and pass given xsave memory area and
@@ -118,19 +123,30 @@ macro_rules! impl_xsave {
 ///
 /// Note that XSAVE instruction support must be enabled, memory area
 /// needs to be 64-byte aligned.
-impl_xsave!(xsave, "xsave");
+impl_xsave!(xsave, "xsave",
+    "Call XSAVE instruction and pass given xsave memory area and
+    set given mask.
 
-/// Restore saved state with XRSTOR instruction.
-impl_xsave!(xrstor, "xrstor");
+    Note that XSAVE instruction support must be enabled, memory area
+    needs to be 64-byte aligned."
+);
 
-/// Save the state with XSAVEOPT instruction.
-impl_xsave!(xsaveopt, "xsaveopt");
+impl_xsave!(xrstor, "xrstor",
+    "Restore saved state with XRSTOR instruction."
+);
 
-/// Save the state using XSAVEC instruction.
-impl_xsave!(xsavec, "xsavec");
+impl_xsave!(xsaveopt, "xsaveopt",
+    "Save the state with XSAVEOPT instruction."
+);
 
-/// Save the state using XSAVES instruction.
-impl_xsave!(xsaves, "xsaves");
+impl_xsave!(xsavec, "xsavec",
+    "Save the state using XSAVEC instruction."
+);
 
-/// Restore the saved state with XRSTORS instruction.
-impl_xsave!(xrstors, "xrstors");
+impl_xsave!(xsaves, "xsaves",
+    "Save the state using XSAVES instruction."
+);
+
+impl_xsave!(xrstors, "xrstors",
+    "Restore the saved state with XRSTORS instruction."
+);
