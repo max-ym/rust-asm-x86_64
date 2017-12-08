@@ -10,7 +10,6 @@ pub struct GeneralPurpose {
     pub rdi     : u64,
 
     pub rbp     : u64,
-    pub rsp     : u64,
 
     pub r8      : u64,
     pub r9      : u64,
@@ -66,6 +65,7 @@ pub struct Floating {
 #[derive(Clone, Copy)]
 #[repr(packed)]
 pub struct State {
+    pub rsp     : u64,
     pub rip     : u64,
     pub flags   : u32,
 }
